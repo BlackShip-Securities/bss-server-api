@@ -25,7 +25,8 @@ jobs:
       - name: Grant Gradle Execution Permission
         run: chmod +x gradlew
         
-      - name: Run Testsrun: ./gradlew --info test
+      - name: Run Tests
+        run: ./gradlew --info test
   
       - name: Post Test Results as PR Comment
         uses: EnricoMi/publish-unit-test-result-action@v2
