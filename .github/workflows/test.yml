@@ -35,7 +35,7 @@ jobs:
         if: always()
         with:
           files: '**/build/test-results/test/TEST-*.xml'
-          token: ${{ github.token }}
+          token: ${{ secrets.ACTION_TOKEN }}
 
       - name: If Failed, Comment on Code Lines for Failed Tests
         uses: mikepenz/action-junit-report@v4
