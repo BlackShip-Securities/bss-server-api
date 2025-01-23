@@ -53,7 +53,5 @@ jobs:
 
       - name: Execute application
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "
-            pkill -f '.*-SNAPSHOT\.jar' || true && \
-            nohup /usr/bin/java -jar /home/${{ secrets.SSH_USER }}/deploy/*-SNAPSHOT.jar > ~/deploy/app.log 2>&1 &
-          "
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "sudo fuser -k 8080/tcp || true"
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "nohup /usr/bin/java -jar /home/${{ secrets.SSH_USER }}/deploy/*-SNAPSHOT.jar > ~/deploy/app.log 2>&1 &"
