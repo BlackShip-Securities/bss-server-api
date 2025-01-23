@@ -11,6 +11,6 @@ public class UserController {
     @GetMapping
     public String healthCheck(){
 
-        return "OK";
+        return "OK-2";
     }
 }
