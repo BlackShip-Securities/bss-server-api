@@ -52,8 +52,12 @@ jobs:
         run: scp *-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }}:~/deploy/
 
       - name: Execute application
-        run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "
-            pkill -f '.*-SNAPSHOT\.jar' || true && \
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            pkill -f .*-SNAPSHOT\.jar
             nohup java -jar ~/deploy/*-SNAPSHOT.jar > ~/deploy/app.log 2>&1 &
-          "
