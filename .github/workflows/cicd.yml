@@ -54,6 +54,6 @@ jobs:
       - name: Execute application
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "
-            pkill -f *-SNAPSHOT.jar \
+            pkill -f *-SNAPSHOT.jar && \
             nohup java -jar ~/deploy/*-SNAPSHOT.jar &
           "
