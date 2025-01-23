@@ -54,7 +54,7 @@ jobs:
       - name: Execute application
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "
-            pkill -f '*-SNAPSHOT.jar' || true && \
+            pkill -f '.*-SNAPSHOT\.jar' || true && \
             EXECUTABLE_JAR=\$(ls ~/deploy/*-SNAPSHOT.jar | head -n 1) && \
             nohup java -jar \$EXECUTABLE_JAR > ~/deploy/app.log 2>&1 &
           "
