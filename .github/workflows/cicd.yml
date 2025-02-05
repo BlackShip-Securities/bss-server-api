@@ -30,6 +30,11 @@ jobs:
           path: build/libs/*.jar
 
   deploy:
+    env:
+      PROJECT_NAME: bss-server-api
+      BUCKET_NAME: bss-white-bucket
+      CODE_DEPLOY_APP_NAME: bss-codedeploy
+      DEPLOYMENT_GROUP_NAME: bss-dg-prod
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -38,20 +43,23 @@ jobs:
         with:
           name: cicdsample
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Zip File
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
+
+      - name: Access to AWS
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_PRIVATE_ACCESS_KEY }}
+          aws-region: ap-northeast-2
 
-      - name: Add known hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
 
-      - name: SCP transfer
-        run: scp *-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }}:~/deploy/
-
-      - name: Execute application
-        run: |
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "sudo fuser -k 8080/tcp || true"
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "nohup /usr/bin/java -jar /home/${{ secrets.SSH_USER }}/deploy/*-SNAPSHOT.jar > ~/deploy/app.log 2>&1 &"
+      - name: Deploy to EC2 with CodeDeploy
+        run: aws deploy create-deployment
+          --application-name $CODE_DEPLOY_APP_NAME
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name $DEPLOYMENT_GROUP_NAME
+          --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
