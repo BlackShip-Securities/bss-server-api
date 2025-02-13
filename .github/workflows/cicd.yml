@@ -23,11 +23,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
+      - name: Create deployment zip
+        run: zip -r build.zip build/libs/*.jar
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: cicdsample
-          path: build/libs/*.jar
+          path: build.zip
 
   deploy:
     needs: build
@@ -48,10 +51,14 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_IP }} >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: SCP transfer
-        run: scp *-SNAPSHOT.jar ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }}:~/deploy/
+      - name: SCP transfer (send zip file)
+        run: scp build.zip ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }}:~/deploy/
 
-      - name: Execute application
+      - name: Extract and Deploy Application
         run: |
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "sudo fuser -k 8080/tcp || true"
-          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} "nohup /usr/bin/java -jar /home/${{ secrets.SSH_USER }}/deploy/*-SNAPSHOT.jar > ~/deploy/app.log 2>&1 &"
+          ssh -v ${{ secrets.SSH_USER }}@${{ secrets.EC2_IP }} << 'EOF'
+            cd ~/deploy
+            unzip -o build.zip
+            sudo fuser -k 8080/tcp || true
+            nohup /usr/bin/java -jar ~/deploy/build/libs/*.jar > ~/deploy/app.log 2>&1 &
+          EOF
