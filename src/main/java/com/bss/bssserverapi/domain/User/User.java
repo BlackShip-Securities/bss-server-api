@@ -16,20 +16,16 @@ public class User extends DateTimeField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "loginId", nullable = false, length = 255)
-    private String loginId;
+    @Column(unique = true, name = "userId", nullable = false, length = 255)
+    private String userId;
 
     @Column(name = "password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "name", nullable = false, length = 255)
-    private String name;
-
     @Builder
-    public User(final String loginId, final String password, final String name){
+    public User(final String userId, final String password) {
 
-        this.loginId = loginId;
+        this.userId = userId;
         this.password = password;
-        this.name = name;
     }
 }

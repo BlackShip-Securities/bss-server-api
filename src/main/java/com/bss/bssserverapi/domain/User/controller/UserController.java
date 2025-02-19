@@ -1,16 +1,22 @@
 package com.bss.bssserverapi.domain.User.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
+import com.bss.bssserverapi.domain.User.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    @GetMapping
-    public String healthCheck(){
+    private final UserService userService;
 
-        return "OK-2";
+    @PostMapping
+    public CreateUserResDto createUser(@RequestBody @Validated final CreateUserReqDto createUserReqDto){
+
+        return userService.createUser(createUserReqDto);
     }
 }
