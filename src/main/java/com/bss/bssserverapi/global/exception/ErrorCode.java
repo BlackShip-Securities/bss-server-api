@@ -1,8 +1,10 @@
 package com.bss.bssserverapi.global.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 @Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ErrorCode {
 
     // auth
@@ -10,7 +12,7 @@ public enum ErrorCode {
     // business
 
     // common
-    INTERNAL_SERVER_ERROR("C001", "Internal Server Error"),
+    UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
     ;
 
     private final String code;

@@ -14,6 +14,6 @@ public class UserController {
     @GetMapping
     public void healthCheck(){
 
-        throw new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+        throw new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_SERVER_ERROR);
     }
 }
