@@ -8,9 +8,8 @@ import lombok.Getter;
 public enum ErrorCode {
 
     // auth
-
+    USER_ALREADY_EXISTS("A001", "User already exists"),
     // business
-
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
     ;
