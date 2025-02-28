@@ -10,14 +10,10 @@ import lombok.NoArgsConstructor;
 public class CreateUserResDto {
 
     private String userId;
-    private String accessToken;
-    private String refreshToken;
 
     @Builder
-    public CreateUserResDto(final String userId, final String accessToken, final String refreshToken) {
+    public CreateUserResDto(final String userId) {
 
         this.userId = userId;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 }

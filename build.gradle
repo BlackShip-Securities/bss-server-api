@@ -40,9 +40,9 @@ dependencies {
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
-    implementation 'io.jsonwebtoken:jjwt-api'
-    implementation 'io.jsonwebtoken:jjwt-impl'
-    implementation 'io.jsonwebtoken:jjwt-jackson'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
