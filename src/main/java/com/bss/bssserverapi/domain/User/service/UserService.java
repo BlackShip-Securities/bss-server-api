@@ -1,6 +1,5 @@
 package com.bss.bssserverapi.domain.User.service;
 
-import com.bss.bssserverapi.domain.Auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.User.User;
 import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
