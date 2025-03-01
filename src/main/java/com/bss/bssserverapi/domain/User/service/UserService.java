@@ -9,6 +9,7 @@ import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final JwtProvider jwtProvider;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public CreateUserResDto createUser(final CreateUserReqDto createUserReqDto){
 
@@ -32,7 +33,7 @@ public class UserService {
 
         User user = userRepository.save(User.builder()
                 .userId(createUserReqDto.getUserId())
-                .password(createUserReqDto.getPassword())
+                .password(bCryptPasswordEncoder.encode(createUserReqDto.getPassword()))
                 .build());
 
         return CreateUserResDto.builder()
