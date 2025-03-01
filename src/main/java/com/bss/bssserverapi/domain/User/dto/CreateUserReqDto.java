@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,4 +29,11 @@ public class CreateUserReqDto {
             message = "8자리에서 20자리, 영 대/소문자, 숫자 한 번씩 포함, !, @, #, $, %, ^, &, +, = 등의 문자를 한 번씩 포함, 띄어쓰기/탭 금지")
     @Schema(example = "Q12341234@")
     private String passwordConfirmation;
+
+    @Builder
+    public CreateUserReqDto(final String userId, final String password, final String passwordConfirmation) {
+        this.userId = userId;
+        this.password = password;
+        this.passwordConfirmation = passwordConfirmation;
+    }
 }
