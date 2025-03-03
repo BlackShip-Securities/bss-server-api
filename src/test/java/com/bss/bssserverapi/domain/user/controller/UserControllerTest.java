@@ -1,24 +1,20 @@
-package com.bss.bssserverapi.user.controller;
+package com.bss.bssserverapi.domain.user.controller;
 
 import com.bss.bssserverapi.domain.User.controller.UserController;
 import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
 import com.bss.bssserverapi.domain.User.service.UserService;
+import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -26,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
-@ExtendWith(MockitoExtension.class)
+@Import(SecurityConfig.class)
 public class UserControllerTest {
 
     @MockBean
@@ -44,16 +40,16 @@ public class UserControllerTest {
 
         // given
         CreateUserReqDto req = CreateUserReqDto.builder()
-                .userId("test")
-                .password("Q12341234@")
-                .passwordConfirmation("Q12341234@")
-                .build();
-        CreateUserResDto res = CreateUserResDto.builder()
-                .userId("test")
+                .userId("bss_admin")
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
                 .build();
 
-        doReturn(res).when(userService)
-                .createUser(any(CreateUserReqDto.class));
+        CreateUserResDto res = CreateUserResDto.builder()
+                .userId("bss_admin")
+                .build();
+
+        doReturn(res).when(userService).createUser(any(CreateUserReqDto.class));
 
         // when & then
         mockMvc.perform(
@@ -61,7 +57,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("userId", res.getUserId()).exists());
+                .andExpect(jsonPath("$.userId").value("bss_admin"));
     }
 
     @Test
@@ -70,8 +66,27 @@ public class UserControllerTest {
 
         // given
         CreateUserReqDto req = CreateUserReqDto.builder()
-                .password("test")
-                .passwordConfirmation("test1")
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
+                .build();
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
+    void createUserFail_InvalidFieldValues() throws Exception {
+
+        // given
+        CreateUserReqDto req = CreateUserReqDto.builder()
+                .userId("bss_admin")
+                .password("invalidPW")
+                .passwordConfirmation("invalidPW")
                 .build();
 
         // when & then
