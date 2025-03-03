@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.user.controller;
+package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.User.controller.UserController;
 import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
