@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.User.controller.UserController;
 import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
 import com.bss.bssserverapi.domain.User.service.UserService;
+import com.bss.bssserverapi.global.config.CorsConfig;
 import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, CorsConfig.class})
 public class UserControllerTest {
 
     @MockBean
