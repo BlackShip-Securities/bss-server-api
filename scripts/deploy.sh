@@ -13,9 +13,9 @@ if [ -z $CURRENT_PID ]
 then
   echo "> 종료할 애플리케이션이 없습니다."
 else
-  echo "> kill -9 $CURRENT_PID"
+  echo "> kill -15 $CURRENT_PID"
   kill -15 $CURRENT_PID
-  sleep 5
+  sleep 10
 fi
 
 # 로그 파일 설정 (날짜별 로그 파일 저장)
