@@ -23,4 +23,4 @@ TIMESTAMP=$(date "+%Y-%m-%d_%H-%M-%S")
 LOG_FILE="/home/ubuntu/bss/logs/app_$TIMESTAMP.log"
 
 echo "> Deploy - $JAR_PATH"
-nohup java -jar $JAR_PATH > $LOG_FILE 2>&1 &
+nohup java -Dspring.profiles.active=prod -jar $JAR_PATH > $LOG_FILE 2>&1 &

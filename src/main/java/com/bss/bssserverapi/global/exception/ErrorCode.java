@@ -8,9 +8,10 @@ import lombok.Getter;
 public enum ErrorCode {
 
     // auth
+    USER_ALREADY_EXISTS("A001", "User already exists"),
+    PASSWORD_AND_CONFIRMATION_MISMATCH("A002", "Password and confirmation do not match"),
 
     // business
-
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
     ;
