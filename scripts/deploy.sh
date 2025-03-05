@@ -13,10 +13,14 @@ if [ -z $CURRENT_PID ]
 then
   echo "> 종료할 애플리케이션이 없습니다."
 else
-  echo "> kill -9 $CURRENT_PID"
+  echo "> kill -15 $CURRENT_PID"
   kill -15 $CURRENT_PID
   sleep 5
 fi
 
-echo "> Deploy - $JAR_PATH "
-nohup java -jar $JAR_PATH > /dev/null 2> /dev/null < /dev/null &
+# 로그 파일 설정 (날짜별 로그 파일 저장)
+TIMESTAMP=$(date "+%Y-%m-%d_%H-%M-%S")
+LOG_FILE="/home/ubuntu/bss/logs/app_$TIMESTAMP.log"
+
+echo "> Deploy - $JAR_PATH"
+nohup java -jar $JAR_PATH > $LOG_FILE 2>&1 &
