@@ -28,9 +28,9 @@ jobs:
         run: |
           mkdir -p src/main/resources
           mkdir -p src/main/resources/mysql
-          printf "%s" "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
-          printf "%s" "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
-          printf "%s" "${{ secrets.APPLICATION_TEST_MYSQL }}" > src/main/resources/mysql/application-test-mysql.yml
+          echo -e "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
+          echo -e "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
+          echo -e "${{ secrets.APPLICATION_TEST_MYSQL }}" > src/main/resources/mysql/application-test-mysql.yml
           ls -al src/main/resources
 
       - name: Grant Gradle Execution Permission

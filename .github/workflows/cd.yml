@@ -21,9 +21,9 @@ jobs:
         run: |
           mkdir -p src/main/resources
           mkdir -p src/main/resources/mysql
-          printf "%s" "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
-          printf "%s" "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
-          printf "%s" "${{ secrets.APPLICATION_PROD_MYSQL }}" > src/main/resources/mysql/application-prod-mysql.yml
+          echo -e "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
+          echo -e "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
+          echo -e "${{ secrets.APPLICATION_PROD_MYSQL }}" > src/main/resources/mysql/application-prod-mysql.yml
           ls -al src/main/resources
 
       - name: Grant execute permission for gradlew
