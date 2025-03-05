@@ -41,6 +41,7 @@ jobs:
           path: |
             appspec.yml
             scripts/
+            logs/
             build/libs/*.jar
 
   deploy:
