@@ -13,7 +13,7 @@ public class LoginUserResDto {
     private String accessToken;
 
     @Builder
-    public LoginUserResDto(String userId, String accessToken) {
+    public LoginUserResDto(final String userId, final String accessToken) {
 
         this.userId = userId;
         this.accessToken = accessToken;

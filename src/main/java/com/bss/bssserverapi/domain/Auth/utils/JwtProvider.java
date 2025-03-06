@@ -29,13 +29,18 @@ public class JwtProvider {
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secret));
     }
 
+    public Date getExpiredDate(String token){
+
+        return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
+    }
+
     public String createAccessToken(String userId){
 
         return Jwts.builder()
                 .claim("userId", userId)
                 .claim("type", "accessToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiredTime))
+                .expiration(new Date(System.currentTimeMillis() + this.accessTokenExpiredTime))
                 .signWith(this.secretKey)
                 .compact();
     }
@@ -46,7 +51,7 @@ public class JwtProvider {
                 .claim("userId", userId)
                 .claim("type", "refreshToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiredTime))
+                .expiration(new Date(System.currentTimeMillis() + this.refreshTokenExpiredTime))
                 .signWith(this.secretKey)
                 .compact();
     }

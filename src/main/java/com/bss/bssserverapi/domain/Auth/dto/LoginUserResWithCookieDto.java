@@ -14,7 +14,7 @@ public class LoginUserResWithCookieDto {
     private LoginUserResDto loginUserResDto;
 
     @Builder
-    public LoginUserResWithCookieDto(ResponseCookie cookie, LoginUserResDto loginUserResDto) {
+    public LoginUserResWithCookieDto(final ResponseCookie cookie, final LoginUserResDto loginUserResDto) {
 
         this.cookie = cookie;
         this.loginUserResDto = loginUserResDto;

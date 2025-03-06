@@ -17,10 +17,10 @@ public class User extends DateTimeField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "userId", nullable = false, length = 255)
+    @Column(unique = true, nullable = false, length = 255)
     private String userId;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String password;
 
     @Builder
