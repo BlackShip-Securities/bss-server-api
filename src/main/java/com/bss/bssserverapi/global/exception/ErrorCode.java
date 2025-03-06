@@ -10,6 +10,8 @@ public enum ErrorCode {
     // auth
     USER_ALREADY_EXISTS("A001", "User already exists"),
     PASSWORD_AND_CONFIRMATION_MISMATCH("A002", "Password and confirmation do not match"),
+    USER_NOT_FOUND("A003", "User not found"),
+    PASSWORD_MISMATCH("A004", "Password do not match"),
 
     // business
     // common

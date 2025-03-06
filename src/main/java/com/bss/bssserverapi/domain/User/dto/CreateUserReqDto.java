@@ -15,7 +15,7 @@ public class CreateUserReqDto {
     @NotNull
     @Pattern(regexp = "^[a-z0-9._]{4,30}$",
             message = "아이디는 4자리에서 30자리 사이의 영문 소문자, 숫자, 밑줄(_), 마침표(.)만 가능합니다.")
-    @Schema(example = "bss_admin")
+    @Schema(example = "bss_test")
     private String userId;
 
     @NotNull
