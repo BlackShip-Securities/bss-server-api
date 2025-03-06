@@ -1,8 +1,8 @@
 package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.User.User;
-import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.repository.UserRepository;
 import com.bss.bssserverapi.domain.User.service.UserService;
 import com.bss.bssserverapi.global.exception.ErrorCode;
@@ -38,7 +38,7 @@ public class UserServiceTest {
     public void createUserSuccess(){
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
@@ -52,7 +52,7 @@ public class UserServiceTest {
                 .save(any(User.class));
 
         // when
-        CreateUserResDto res = userService.createUser(req);
+        SignupUserResDto res = userService.createUser(req);
 
         // then
         assertThat(res.getUserId()).isEqualTo(req.getUserId());
@@ -63,7 +63,7 @@ public class UserServiceTest {
     public void createUserFail_PasswordMismatch(){
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@!!!!!!!!!!!!")
                 .passwordConfirmation("Qq12341234@")

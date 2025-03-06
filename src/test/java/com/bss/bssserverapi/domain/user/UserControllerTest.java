@@ -1,8 +1,8 @@
 package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.User.controller.UserController;
-import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.service.UserService;
 import com.bss.bssserverapi.global.config.CorsConfig;
 import com.bss.bssserverapi.global.config.SecurityConfig;
@@ -40,17 +40,17 @@ public class UserControllerTest {
     void createUserSuccess() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
-        CreateUserResDto res = CreateUserResDto.builder()
+        SignupUserResDto res = SignupUserResDto.builder()
                 .userId("bss_admin")
                 .build();
 
-        doReturn(res).when(userService).createUser(any(CreateUserReqDto.class));
+        doReturn(res).when(userService).createUser(any(SignupUserUserReqDto.class));
 
         // when & then
         mockMvc.perform(
@@ -66,7 +66,7 @@ public class UserControllerTest {
     void createUserFail_MissingFields() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
@@ -84,7 +84,7 @@ public class UserControllerTest {
     void createUserFail_InvalidFieldValues() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
                 .userId("bss_admin")
                 .password("invalidPW")
                 .passwordConfirmation("invalidPW")

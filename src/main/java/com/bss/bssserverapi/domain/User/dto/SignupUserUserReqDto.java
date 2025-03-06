@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CreateUserReqDto {
+public class SignupUserUserReqDto {
 
     @NotNull
     @Pattern(regexp = "^[a-z0-9._]{4,30}$",
@@ -31,7 +31,7 @@ public class CreateUserReqDto {
     private String passwordConfirmation;
 
     @Builder
-    public CreateUserReqDto(final String userId, final String password, final String passwordConfirmation) {
+    public SignupUserUserReqDto(final String userId, final String password, final String passwordConfirmation) {
         this.userId = userId;
         this.password = password;
         this.passwordConfirmation = passwordConfirmation;

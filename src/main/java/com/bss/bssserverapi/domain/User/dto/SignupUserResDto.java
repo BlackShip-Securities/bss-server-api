@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class CreateUserResDto {
+public class SignupUserResDto {
 
     private String userId;
 
     @Builder
-    public CreateUserResDto(final String userId) {
+    public SignupUserResDto(final String userId) {
 
         this.userId = userId;
     }
