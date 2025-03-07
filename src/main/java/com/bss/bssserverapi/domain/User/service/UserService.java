@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.domain.User.service;
 
 import com.bss.bssserverapi.domain.User.User;
+import com.bss.bssserverapi.domain.User.dto.GetUserResDto;
 import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.repository.UserRepository;
@@ -39,6 +40,16 @@ public class UserService {
                 .build());
 
         return SignupUserResDto.builder()
+                .userId(user.getUserId())
+                .build();
+    }
+
+    public GetUserResDto getUser(final String userId){
+
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        return GetUserResDto.builder()
                 .userId(user.getUserId())
                 .build();
     }

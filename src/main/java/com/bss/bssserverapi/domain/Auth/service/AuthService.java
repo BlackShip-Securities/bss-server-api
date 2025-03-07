@@ -30,7 +30,7 @@ public class AuthService {
     public LoginUserResWithCookieDto login(final LoginUserReqDto loginUserReqDto){
 
         User user = userRepository.findByUserId(loginUserReqDto.getUserId())
-                .orElseThrow(() -> new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
 
