@@ -1,11 +1,13 @@
 package com.bss.bssserverapi.global.config;
 
+import com.bss.bssserverapi.domain.Auth.filter.ExceptionHandlerFilter;
+import com.bss.bssserverapi.domain.Auth.filter.GlobalAccessDeniedHandler;
+import com.bss.bssserverapi.domain.Auth.filter.GlobalAuthenticationEntryPoint;
 import com.bss.bssserverapi.domain.Auth.filter.JwtAuthenticationFilter;
 import com.bss.bssserverapi.domain.Auth.utils.JwtProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,18 +18,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
+    private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtProvider jwtProvider;
 
     public SecurityConfig(
             @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
             JwtProvider jwtProvider) {
 
+        this.handlerExceptionResolver = handlerExceptionResolver;
         this.corsConfigurationSource = corsConfigurationSource;
         this.jwtProvider = jwtProvider;
     }
@@ -71,10 +77,21 @@ public class SecurityConfig {
                 .authenticated()
         );
 
+        http.exceptionHandling(config -> config
+                .authenticationEntryPoint(new GlobalAuthenticationEntryPoint(handlerExceptionResolver))
+                .accessDeniedHandler(new GlobalAccessDeniedHandler(handlerExceptionResolver))
+        );
+
+        http.addFilterBefore(
+                new ExceptionHandlerFilter(handlerExceptionResolver),
+                UsernamePasswordAuthenticationFilter.class
+        );
+
         http.addFilterBefore(
                 new JwtAuthenticationFilter(this.jwtProvider),
                 UsernamePasswordAuthenticationFilter.class
         );
+
 
         return http.build();
     }
