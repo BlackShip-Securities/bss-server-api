@@ -1,7 +1,7 @@
 package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.User.User;
-import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.repository.UserRepository;
 import com.bss.bssserverapi.domain.User.service.UserService;
@@ -38,7 +38,7 @@ public class UserServiceTest {
     public void createUserSuccess(){
 
         // given
-        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
@@ -63,7 +63,7 @@ public class UserServiceTest {
     public void createUserFail_PasswordMismatch(){
 
         // given
-        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@!!!!!!!!!!!!")
                 .passwordConfirmation("Qq12341234@")

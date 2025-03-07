@@ -1,7 +1,7 @@
 package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.User.controller.UserController;
-import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.service.UserService;
 import com.bss.bssserverapi.global.config.CorsConfig;
@@ -40,7 +40,7 @@ public class UserControllerTest {
     void createUserSuccess() throws Exception {
 
         // given
-        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
@@ -50,7 +50,7 @@ public class UserControllerTest {
                 .userId("bss_admin")
                 .build();
 
-        doReturn(res).when(userService).createUser(any(SignupUserUserReqDto.class));
+        doReturn(res).when(userService).createUser(any(SignupUserReqDto.class));
 
         // when & then
         mockMvc.perform(
@@ -66,7 +66,7 @@ public class UserControllerTest {
     void createUserFail_MissingFields() throws Exception {
 
         // given
-        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
@@ -84,7 +84,7 @@ public class UserControllerTest {
     void createUserFail_InvalidFieldValues() throws Exception {
 
         // given
-        SignupUserUserReqDto req = SignupUserUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("invalidPW")
                 .passwordConfirmation("invalidPW")

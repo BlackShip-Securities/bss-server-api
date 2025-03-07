@@ -1,7 +1,7 @@
 package com.bss.bssserverapi.domain.User.service;
 
 import com.bss.bssserverapi.domain.User.User;
-import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.User.repository.UserRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
@@ -21,21 +21,21 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public SignupUserResDto signupUser(final SignupUserUserReqDto signupUserUserReqDto){
+    public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto){
 
-        if(userRepository.existsByUserId(signupUserUserReqDto.getUserId())){
+        if(userRepository.existsByUserId(signupUserReqDto.getUserId())){
 
             throw new GlobalException(HttpStatus.CONFLICT, ErrorCode.USER_ALREADY_EXISTS);
         }
 
-        if(!signupUserUserReqDto.getPassword().equals(signupUserUserReqDto.getPasswordConfirmation())){
+        if(!signupUserReqDto.getPassword().equals(signupUserReqDto.getPasswordConfirmation())){
 
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
         }
 
         User user = userRepository.save(User.builder()
-                .userId(signupUserUserReqDto.getUserId())
-                .password(bCryptPasswordEncoder.encode(signupUserUserReqDto.getPassword()))
+                .userId(signupUserReqDto.getUserId())
+                .password(bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()))
                 .build());
 
         return SignupUserResDto.builder()

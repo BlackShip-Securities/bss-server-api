@@ -1,6 +1,6 @@
 package com.bss.bssserverapi.domain.User.controller;
 
-import com.bss.bssserverapi.domain.User.dto.SignupUserUserReqDto;
+import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.User.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +19,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserUserReqDto signupUserUserReqDto){
+    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto){
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userService.signupUser(signupUserUserReqDto));
+                .body(userService.signupUser(signupUserReqDto));
     }
 }
