@@ -1,5 +1,7 @@
 package com.bss.bssserverapi.global.config;
 
+import com.bss.bssserverapi.domain.Auth.filter.JwtAuthenticationFilter;
+import com.bss.bssserverapi.domain.Auth.utils.JwtProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -19,10 +22,14 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
+    private final JwtProvider jwtProvider;
 
-    public SecurityConfig(@Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource) {
+    public SecurityConfig(
+            @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
+            JwtProvider jwtProvider) {
 
         this.corsConfigurationSource = corsConfigurationSource;
+        this.jwtProvider = jwtProvider;
     }
 
     @Bean
@@ -62,6 +69,11 @@ public class SecurityConfig {
                 .permitAll()
                 .anyRequest()
                 .authenticated()
+        );
+
+        http.addFilterBefore(
+                new JwtAuthenticationFilter(this.jwtProvider),
+                UsernamePasswordAuthenticationFilter.class
         );
 
         return http.build();
