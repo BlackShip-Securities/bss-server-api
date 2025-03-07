@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface AuthJpaRepository extends JpaRepository<Auth, String> {
 
-    Optional<String> findRefreshTokenById(final String userId);
+    Optional<String> findRefreshTokenByUserId(final String userId);
 }

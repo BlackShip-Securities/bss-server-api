@@ -13,7 +13,7 @@ import java.util.Date;
 public class Auth {
 
     @Id
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(nullable = false, length = 255, unique = true)
     private String userId;
 
     @Column(nullable = false, length = 512)

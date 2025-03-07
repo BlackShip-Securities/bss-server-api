@@ -26,7 +26,7 @@ public class AuthRepositoryImpl implements AuthRepository{
     @Override
     public Optional<String> refreshToken(final String userId) {
 
-        return authJpaRepository.findRefreshTokenById(userId);
+        return authJpaRepository.findRefreshTokenByUserId(userId);
     }
 
     @Override
