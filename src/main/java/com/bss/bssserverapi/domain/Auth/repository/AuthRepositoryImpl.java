@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class AuthJpaRepositoryImpl implements AuthRepository{
+public class AuthRepositoryImpl implements AuthRepository{
 
     private final AuthJpaRepository authJpaRepository;
 
