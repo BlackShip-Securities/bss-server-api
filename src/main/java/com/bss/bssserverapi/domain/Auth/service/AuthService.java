@@ -76,6 +76,16 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public LogoutUserResDto logout(final String userId){
+
+        authRepository.delete(userId);
+
+        return LogoutUserResDto.builder()
+                .cookie(deleteResponseCookie())
+                .build();
+    }
+
     private ResponseCookie createResponseCookie(final String refreshToken){
 
         return ResponseCookie.from("refresh_token", refreshToken)
@@ -84,6 +94,17 @@ public class AuthService {
 //                .sameSite("Strict") // CSRF 방지
                 .path("/")
                 .maxAge(jwtProvider.getRefreshTokenExpiredTime() / 1000)
+                .build();
+    }
+
+    private ResponseCookie deleteResponseCookie(){
+
+        return ResponseCookie.from("refresh_token", "")
+                .httpOnly(true) // XSS 방지
+                .secure(true) // HTTPS 에서만 전송
+//                .sameSite("Strict") // CSRF 방지
+                .path("/")
+                .maxAge(0)
                 .build();
     }
 }

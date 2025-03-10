@@ -7,8 +7,10 @@ import com.bss.bssserverapi.domain.Auth.dto.RefreshTokenResWithCookieDto;
 import com.bss.bssserverapi.domain.Auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,18 +27,27 @@ public class AuthController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header("Set-Cookie", loginUserResWithCookieDto.getCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, loginUserResWithCookieDto.getCookie().toString())
                 .body(loginUserResWithCookieDto.getLoginUserResDto());
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
+    public ResponseEntity<?> refresh(@CookieValue(name = "refresh_token", required = false) final String refreshToken) {
 
         RefreshTokenResWithCookieDto refreshTokenResWithCookieDto = authService.refresh(refreshToken);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header("Set-Cookie", refreshTokenResWithCookieDto.getCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, refreshTokenResWithCookieDto.getCookie().toString())
                 .body(refreshTokenResWithCookieDto.getRefreshTokenResDto());
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal final String userId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, authService.logout(userId).getCookie().toString())
+                .body("");
     }
 }
