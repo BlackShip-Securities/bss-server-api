@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.domain.user;
 
+import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.controller.UserController;
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
@@ -10,8 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,8 +26,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-@Import({SecurityConfig.class, CorsConfig.class})
+@WebMvcTest(
+        controllers = UserController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)}
+)
 public class UserControllerTest {
 
     @MockBean
@@ -41,24 +49,24 @@ public class UserControllerTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userId("bss_test")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         SignupUserResDto res = SignupUserResDto.builder()
-                .userId("bss_admin")
+                .userId("bss_test")
                 .build();
 
         doReturn(res).when(userService).signupUser(any(SignupUserReqDto.class));
 
         // when & then
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/users")
+                MockMvcRequestBuilders.post("/api/v1/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value("bss_admin"));
+                .andExpect(jsonPath("$.userId").value("bss_test"));
     }
 
     @Test
@@ -73,7 +81,7 @@ public class UserControllerTest {
 
         // when & then
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/v1/users")
+                        MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isInternalServerError());
@@ -92,7 +100,7 @@ public class UserControllerTest {
 
         // when & then
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/v1/users")
+                        MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isInternalServerError());
