@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         List<String> EXCLUDED_URLS = List.of(
                 "/api/v1/auth/login",
-                "/api/v1/users/signup"
+                "/api/v1/auth/refresh"
         );
 
         return EXCLUDED_URLS.contains(request.getRequestURI());
@@ -41,7 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
 
-        String refreshToken = this.extractRefreshTokenFromHeader(request);
+        String refreshToken = this.extractRefreshTokenFromHeader(request, response, filterChain);
+        if(!StringUtils.hasText(refreshToken)){
+
+            return;
+        }
 
         this.validateToken(refreshToken);
 
@@ -54,12 +58,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String extractRefreshTokenFromHeader(final HttpServletRequest request){
+    private String extractRefreshTokenFromHeader(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException{
 
         String header = request.getHeader("Authorization");
         if(!StringUtils.hasText(header)){
 
-            throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHENTICATED);
+            filterChain.doFilter(request, response);
+            return null;
         }
 
         return header.substring(7);

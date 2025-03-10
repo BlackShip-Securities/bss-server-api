@@ -1,8 +1,6 @@
 package com.bss.bssserverapi.domain.Auth.service;
 
-import com.bss.bssserverapi.domain.Auth.dto.LoginUserReqDto;
-import com.bss.bssserverapi.domain.Auth.dto.LoginUserResDto;
-import com.bss.bssserverapi.domain.Auth.dto.LoginUserResWithCookieDto;
+import com.bss.bssserverapi.domain.Auth.dto.*;
 import com.bss.bssserverapi.domain.Auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.Auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.User.User;
@@ -15,6 +13,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @Transactional(readOnly = true)
@@ -52,7 +51,32 @@ public class AuthService {
                 .build();
     }
 
-    private ResponseCookie createResponseCookie(String refreshToken){
+    @Transactional
+    public RefreshTokenResWithCookieDto refresh(String refreshToken){
+
+        if (!StringUtils.hasText(refreshToken)) {
+
+            throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHENTICATED);
+        }
+
+        jwtProvider.validateToken(refreshToken);
+
+        String userId = jwtProvider.getUserId(refreshToken);
+        String accessToken = jwtProvider.createAccessToken(userId);
+        String newRefreshToken = jwtProvider.createRefreshToken(userId);
+
+        authRepository.delete(userId);
+        authRepository.save(userId, refreshToken, jwtProvider.getExpiredDate(newRefreshToken));
+
+        return RefreshTokenResWithCookieDto.builder()
+                .cookie(createResponseCookie(refreshToken))
+                .refreshTokenResDto(RefreshTokenResDto.builder()
+                        .accessToken(accessToken)
+                        .build())
+                .build();
+    }
+
+    private ResponseCookie createResponseCookie(final String refreshToken){
 
         return ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true) // XSS 방지
