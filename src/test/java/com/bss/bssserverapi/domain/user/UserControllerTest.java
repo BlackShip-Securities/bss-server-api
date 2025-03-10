@@ -1,12 +1,12 @@
 package com.bss.bssserverapi.domain.user;
 
-import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.controller.UserController;
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.user.service.UserService;
-import com.bss.bssserverapi.global.config.CorsConfig;
 import com.bss.bssserverapi.global.config.SecurityConfig;
+import com.bss.bssserverapi.global.exception.ErrorCode;
+import com.bss.bssserverapi.global.exception.GlobalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +16,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +58,7 @@ public class UserControllerTest {
                 .userId("bss_test")
                 .build();
 
-        doReturn(res).when(userService).signupUser(any(SignupUserReqDto.class));
+        given(userService.signupUser(any(SignupUserReqDto.class))).willReturn(res);
 
         // when & then
         mockMvc.perform(
@@ -79,12 +79,16 @@ public class UserControllerTest {
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
+        GlobalException res = new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_SERVER_ERROR);
+
         // when & then
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value(ErrorCode.UNKNOWN_SERVER_ERROR.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.UNKNOWN_SERVER_ERROR.getMessage()));
     }
 
     @Test
@@ -98,11 +102,15 @@ public class UserControllerTest {
                 .passwordConfirmation("invalidPW")
                 .build();
 
+        GlobalException res = new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_SERVER_ERROR);
+
         // when & then
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value(ErrorCode.UNKNOWN_SERVER_ERROR.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.UNKNOWN_SERVER_ERROR.getMessage()));
     }
 }
