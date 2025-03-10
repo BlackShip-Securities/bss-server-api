@@ -1,9 +1,9 @@
 package com.bss.bssserverapi.domain.user;
 
-import com.bss.bssserverapi.domain.User.controller.UserController;
-import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
-import com.bss.bssserverapi.domain.User.service.UserService;
+import com.bss.bssserverapi.domain.user.controller.UserController;
+import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
+import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
+import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.config.CorsConfig;
 import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +50,7 @@ public class UserControllerTest {
                 .userId("bss_admin")
                 .build();
 
-        doReturn(res).when(userService).createUser(any(SignupUserReqDto.class));
+        doReturn(res).when(userService).signupUser(any(SignupUserReqDto.class));
 
         // when & then
         mockMvc.perform(

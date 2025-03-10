@@ -1,10 +1,10 @@
 package com.bss.bssserverapi.global.config;
 
-import com.bss.bssserverapi.domain.Auth.filter.ExceptionHandlerFilter;
-import com.bss.bssserverapi.domain.Auth.filter.GlobalAccessDeniedHandler;
-import com.bss.bssserverapi.domain.Auth.filter.GlobalAuthenticationEntryPoint;
-import com.bss.bssserverapi.domain.Auth.filter.JwtAuthenticationFilter;
-import com.bss.bssserverapi.domain.Auth.utils.JwtProvider;
+import com.bss.bssserverapi.domain.auth.filter.ExceptionHandlerFilter;
+import com.bss.bssserverapi.domain.auth.filter.GlobalAccessDeniedHandler;
+import com.bss.bssserverapi.domain.auth.filter.GlobalAuthenticationEntryPoint;
+import com.bss.bssserverapi.domain.auth.filter.JwtAuthenticationFilter;
+import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

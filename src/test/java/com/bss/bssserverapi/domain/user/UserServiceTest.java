@@ -1,10 +1,9 @@
 package com.bss.bssserverapi.domain.user;
 
-import com.bss.bssserverapi.domain.User.User;
-import com.bss.bssserverapi.domain.User.dto.SignupUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.SignupUserResDto;
-import com.bss.bssserverapi.domain.User.repository.UserRepository;
-import com.bss.bssserverapi.domain.User.service.UserService;
+import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
+import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
+import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
@@ -52,7 +51,7 @@ public class UserServiceTest {
                 .save(any(User.class));
 
         // when
-        SignupUserResDto res = userService.createUser(req);
+        SignupUserResDto res = userService.signupUser(req);
 
         // then
         assertThat(res.getUserId()).isEqualTo(req.getUserId());
@@ -70,7 +69,7 @@ public class UserServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> userService.createUser(req))
+        assertThatThrownBy(() -> userService.signupUser(req))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH.getMessage());
     }
