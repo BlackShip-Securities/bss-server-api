@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class SwaggerConfig {
 
@@ -18,19 +20,28 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI api() {
 
-//        Server server = new Server();
-//        server.setUrl(domain);
-
         return new OpenAPI()
-                .components(new Components().addSecuritySchemes("Bearer Token",
-                        new SecurityScheme()
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .in(SecurityScheme.In.HEADER)
-                                .name("Authorization")))
+                .components(new Components().addSecuritySchemes("Bearer Token", securityScheme()))
                 .addSecurityItem(new SecurityRequirement()
-                        .addList("Bearer Token"));
-//                .addServersItem(server);
+                        .addList("Bearer Token"))
+                .servers(List.of(
+                        createServer(domain),
+                        createServer("http://localhost:8080")
+                ));
+    }
+
+    private SecurityScheme securityScheme() {
+
+        return new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .in(SecurityScheme.In.HEADER)
+                .name("Authorization");
+    }
+
+    private Server createServer(String url) {
+
+        return new Server().url(url);
     }
 }
