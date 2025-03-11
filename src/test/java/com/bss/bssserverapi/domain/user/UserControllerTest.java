@@ -6,7 +6,6 @@ import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.bss.bssserverapi.global.exception.ErrorCode;
-import com.bss.bssserverapi.global.exception.GlobalException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -79,8 +77,6 @@ public class UserControllerTest {
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
-        GlobalException res = new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_SERVER_ERROR);
-
         // when & then
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/api/v1/users/signup")
@@ -97,12 +93,10 @@ public class UserControllerTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userId("bss_test")
                 .password("invalidPW")
                 .passwordConfirmation("invalidPW")
                 .build();
-
-        GlobalException res = new GlobalException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_SERVER_ERROR);
 
         // when & then
         mockMvc.perform(

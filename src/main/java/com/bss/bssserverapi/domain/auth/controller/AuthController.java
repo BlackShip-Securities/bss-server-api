@@ -50,4 +50,10 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, authService.logout(userId).getCookie().toString())
                 .body("");
     }
+
+    @GetMapping("/token-test")
+    public void tokenTest() {
+
+        return;
+    }
 }

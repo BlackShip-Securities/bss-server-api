@@ -2,6 +2,7 @@ package com.bss.bssserverapi.domain.auth.service;
 
 import com.bss.bssserverapi.domain.auth.dto.*;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
+import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.domain.user.repository.UserRepository;
@@ -9,7 +10,6 @@ import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +43,7 @@ public class AuthService {
         authRepository.save(user.getUserId(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
 
         return LoginUserResWithCookieDto.builder()
-                .cookie(this.createResponseCookie(refreshToken))
+                .cookie(CookieProvider.createResponseCookie(refreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
                 .loginUserResDto(LoginUserResDto.builder()
                         .userId(user.getUserId())
                         .accessToken(accessToken)
@@ -69,7 +69,7 @@ public class AuthService {
         authRepository.save(userId, refreshToken, jwtProvider.getExpiredDate(newRefreshToken));
 
         return RefreshTokenResWithCookieDto.builder()
-                .cookie(createResponseCookie(refreshToken))
+                .cookie(CookieProvider.createResponseCookie(refreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
                 .refreshTokenResDto(RefreshTokenResDto.builder()
                         .accessToken(accessToken)
                         .build())
@@ -82,29 +82,7 @@ public class AuthService {
         authRepository.delete(userId);
 
         return LogoutUserResDto.builder()
-                .cookie(deleteResponseCookie())
-                .build();
-    }
-
-    private ResponseCookie createResponseCookie(final String refreshToken){
-
-        return ResponseCookie.from("refresh_token", refreshToken)
-                .httpOnly(true) // XSS 방지
-                .secure(true) // HTTPS 에서만 전송
-//                .sameSite("Strict") // CSRF 방지
-                .path("/")
-                .maxAge(jwtProvider.getRefreshTokenExpiredTime() / 1000)
-                .build();
-    }
-
-    private ResponseCookie deleteResponseCookie(){
-
-        return ResponseCookie.from("refresh_token", "")
-                .httpOnly(true) // XSS 방지
-                .secure(true) // HTTPS 에서만 전송
-//                .sameSite("Strict") // CSRF 방지
-                .path("/")
-                .maxAge(0)
+                .cookie(CookieProvider.deleteResponseCookie())
                 .build();
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -66,6 +68,34 @@ public class JwtProvider {
                 .claim("type", "refreshToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + this.refreshTokenExpiredTime))
+                .signWith(this.secretKey)
+                .compact();
+    }
+
+    public String createTamperedAccessToken(String originalToken, String newUserId) {
+
+        String[] tokenParts = originalToken.split("\\.");
+
+        // 1. 기존 JWT의 Payload 디코딩
+        String payloadJson = new String(Base64.getUrlDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
+
+        // 2. userId 값을 변경
+        payloadJson = payloadJson.replace("\"userId\":\"bss_test\"", "\"userId\":\"" + newUserId + "\"");
+
+        // 3. 변조된 Payload를 다시 Base64로 인코딩
+        String tamperedPayload = Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
+
+        // 4. 변조된 JWT 반환 (서명(Signature) 부분은 그대로 유지)
+        return tokenParts[0] + "." + tamperedPayload + "." + tokenParts[2];
+    }
+
+    public String createExpiredAccessToken(final String userId){
+
+        return Jwts.builder()
+                .claim("userId", userId)
+                .claim("type", "accessToken")
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() - 1))
                 .signWith(this.secretKey)
                 .compact();
     }
