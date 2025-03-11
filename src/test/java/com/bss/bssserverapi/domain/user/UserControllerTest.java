@@ -1,29 +1,35 @@
 package com.bss.bssserverapi.domain.user;
 
-import com.bss.bssserverapi.domain.User.controller.UserController;
-import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
-import com.bss.bssserverapi.domain.User.service.UserService;
-import com.bss.bssserverapi.global.config.CorsConfig;
+import com.bss.bssserverapi.domain.user.controller.UserController;
+import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
+import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
+import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.config.SecurityConfig;
+import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-@Import({SecurityConfig.class, CorsConfig.class})
+@WebMvcTest(
+        controllers = UserController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class)}
+)
 public class UserControllerTest {
 
     @MockBean
@@ -37,64 +43,68 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    void createUserSuccess() throws Exception {
+    void createUser_Success() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
-                .userId("bss_admin")
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userId("bss_test")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
-        CreateUserResDto res = CreateUserResDto.builder()
-                .userId("bss_admin")
+        SignupUserResDto res = SignupUserResDto.builder()
+                .userId("bss_test")
                 .build();
 
-        doReturn(res).when(userService).createUser(any(CreateUserReqDto.class));
+        given(userService.signupUser(any(SignupUserReqDto.class))).willReturn(res);
 
         // when & then
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/users")
+                MockMvcRequestBuilders.post("/api/v1/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value("bss_admin"));
+                .andExpect(jsonPath("$.userId").value("bss_test"));
     }
 
     @Test
     @DisplayName("회원 가입 실패 - 필수 필드 누락")
-    void createUserFail_MissingFields() throws Exception {
+    void createUser_Fail_MissingFields() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         // when & then
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/v1/users")
+                        MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value(ErrorCode.UNKNOWN_SERVER_ERROR.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.UNKNOWN_SERVER_ERROR.getMessage()));
     }
 
     @Test
     @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
-    void createUserFail_InvalidFieldValues() throws Exception {
+    void createUser_Fail_InvalidFieldValues() throws Exception {
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
-                .userId("bss_admin")
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userId("bss_test")
                 .password("invalidPW")
                 .passwordConfirmation("invalidPW")
                 .build();
 
         // when & then
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/v1/users")
+                        MockMvcRequestBuilders.post("/api/v1/users/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value(ErrorCode.UNKNOWN_SERVER_ERROR.getCode()))
+                .andExpect(jsonPath("$.message").value(ErrorCode.UNKNOWN_SERVER_ERROR.getMessage()));
     }
 }

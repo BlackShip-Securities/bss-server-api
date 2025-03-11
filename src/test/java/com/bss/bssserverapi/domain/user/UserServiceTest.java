@@ -1,10 +1,9 @@
 package com.bss.bssserverapi.domain.user;
 
-import com.bss.bssserverapi.domain.User.User;
-import com.bss.bssserverapi.domain.User.dto.CreateUserReqDto;
-import com.bss.bssserverapi.domain.User.dto.CreateUserResDto;
-import com.bss.bssserverapi.domain.User.repository.UserRepository;
-import com.bss.bssserverapi.domain.User.service.UserService;
+import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
+import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
+import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
@@ -35,10 +34,10 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    public void createUserSuccess(){
+    public void createUser_Success(){
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
@@ -52,7 +51,7 @@ public class UserServiceTest {
                 .save(any(User.class));
 
         // when
-        CreateUserResDto res = userService.createUser(req);
+        SignupUserResDto res = userService.signupUser(req);
 
         // then
         assertThat(res.getUserId()).isEqualTo(req.getUserId());
@@ -60,17 +59,17 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 실패 - 비밀번호, 비밀번호 확인 일치 하지 않음")
-    public void createUserFail_PasswordMismatch(){
+    public void createUser_Fail_PasswordMismatch(){
 
         // given
-        CreateUserReqDto req = CreateUserReqDto.builder()
+        SignupUserReqDto req = SignupUserReqDto.builder()
                 .userId("bss_admin")
                 .password("Qq12341234@!!!!!!!!!!!!")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> userService.createUser(req))
+        assertThatThrownBy(() -> userService.signupUser(req))
                 .isInstanceOf(GlobalException.class)
                 .hasMessage(ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH.getMessage());
     }

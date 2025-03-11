@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.User;
+package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
@@ -17,10 +17,10 @@ public class User extends DateTimeField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, name = "userId", nullable = false, length = 255)
+    @Column(unique = true, nullable = false, length = 255)
     private String userId;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(nullable = false, length = 255)
     private String password;
 
     @Builder

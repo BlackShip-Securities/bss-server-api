@@ -18,8 +18,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI api() {
 
-        Server server = new Server();
-        server.setUrl(domain);
+//        Server server = new Server();
+//        server.setUrl(domain);
 
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("Bearer Token",
@@ -30,7 +30,7 @@ public class SwaggerConfig {
                                 .in(SecurityScheme.In.HEADER)
                                 .name("Authorization")))
                 .addSecurityItem(new SecurityRequirement()
-                        .addList("Bearer Token"))
-                .addServersItem(server);
+                        .addList("Bearer Token"));
+//                .addServersItem(server);
     }
 }
