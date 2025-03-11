@@ -39,7 +39,7 @@ public class AuthService {
         String accessToken = jwtProvider.createAccessToken(user.getUserId());
         String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
 
-        authRepository.delete(user.getUserId());
+        authRepository.deleteByUserId(user.getUserId());
         authRepository.save(user.getUserId(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
 
         return LoginUserResWithCookieDto.builder()
@@ -65,11 +65,11 @@ public class AuthService {
         String accessToken = jwtProvider.createAccessToken(userId);
         String newRefreshToken = jwtProvider.createRefreshToken(userId);
 
-        authRepository.delete(userId);
-        authRepository.save(userId, refreshToken, jwtProvider.getExpiredDate(newRefreshToken));
+        authRepository.deleteByUserId(userId);
+        authRepository.save(userId, newRefreshToken, jwtProvider.getExpiredDate(newRefreshToken));
 
         return RefreshTokenResWithCookieDto.builder()
-                .cookie(CookieProvider.createResponseCookie(refreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
+                .cookie(CookieProvider.createResponseCookie(newRefreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
                 .refreshTokenResDto(RefreshTokenResDto.builder()
                         .accessToken(accessToken)
                         .build())
@@ -79,7 +79,7 @@ public class AuthService {
     @Transactional
     public LogoutUserResDto logout(final String userId){
 
-        authRepository.delete(userId);
+        authRepository.deleteByUserId(userId);
 
         return LogoutUserResDto.builder()
                 .cookie(CookieProvider.deleteResponseCookie())

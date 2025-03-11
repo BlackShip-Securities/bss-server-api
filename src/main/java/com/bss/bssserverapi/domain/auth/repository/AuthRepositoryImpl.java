@@ -24,13 +24,13 @@ public class AuthRepositoryImpl implements AuthRepository{
     }
 
     @Override
-    public Optional<String> refreshToken(final String userId) {
+    public Optional<Auth> findAuthByUserId(final String userId) {
 
-        return authJpaRepository.findRefreshTokenByUserId(userId);
+        return authJpaRepository.findAuthByUserId(userId);
     }
 
     @Override
-    public void delete(final String userId) {
+    public void deleteByUserId(final String userId) {
 
         authJpaRepository.deleteById(userId);
     }
