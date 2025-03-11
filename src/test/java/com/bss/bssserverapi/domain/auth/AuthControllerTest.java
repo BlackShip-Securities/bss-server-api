@@ -49,7 +49,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("인증(로그인) 성공")
-    void loginUserSuccess() throws Exception {
+    void login_Success() throws Exception {
 
         // given
         LoginUserReqDto req = LoginUserReqDto.builder()
@@ -81,7 +81,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("인가 실패 - 액세스 토큰 없음")
-    void authorizationFail_NoAccessToken() throws Exception {
+    void authorization_Fail_NoAccessToken() throws Exception {
 
         // when & then
         mockMvc.perform(
@@ -96,7 +96,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("액세스 토큰 검증 실패 - 만료 시간")
-    void tokenValidFail_Expired() throws Exception {
+    void tokenValid_Fail_Expired() throws Exception {
 
         // given
         String accessToken = jwtProvider.createExpiredAccessToken("bss_test");
@@ -114,7 +114,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("액세스 토큰 검증 실패 - 위변조")
-    void tokenValidFail_Tampered() throws Exception {
+    void tokenValid_Fail_Tampered() throws Exception {
 
         // given
         String accessToken = jwtProvider.createAccessToken("bss_test");
@@ -133,7 +133,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("액세스 토큰 재발급(리프레시) 성공")
-    void refreshTokenSuccess() throws Exception {
+    void refreshToken_Success() throws Exception {
 
         // given
         String refreshToken = "rt_test";

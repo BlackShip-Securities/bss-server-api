@@ -43,7 +43,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    void createUserSuccess() throws Exception {
+    void createUser_Success() throws Exception {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
@@ -69,7 +69,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 가입 실패 - 필수 필드 누락")
-    void createUserFail_MissingFields() throws Exception {
+    void createUser_Fail_MissingFields() throws Exception {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
@@ -89,7 +89,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
-    void createUserFail_InvalidFieldValues() throws Exception {
+    void createUser_Fail_InvalidFieldValues() throws Exception {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()

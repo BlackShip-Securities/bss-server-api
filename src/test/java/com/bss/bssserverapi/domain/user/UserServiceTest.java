@@ -34,7 +34,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 성공")
-    public void createUserSuccess(){
+    public void createUser_Success(){
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
@@ -59,7 +59,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 실패 - 비밀번호, 비밀번호 확인 일치 하지 않음")
-    public void createUserFail_PasswordMismatch(){
+    public void createUser_Fail_PasswordMismatch(){
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
