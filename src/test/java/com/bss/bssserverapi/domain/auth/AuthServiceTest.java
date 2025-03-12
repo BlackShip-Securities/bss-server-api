@@ -8,7 +8,7 @@ import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.User;
-import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class AuthServiceTest {
     private AuthRepository authRepository;
 
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -64,7 +64,7 @@ class AuthServiceTest {
 
         LoginUserReqDto req = new LoginUserReqDto(userName, password);
 
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+        when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(password, hashedPassword)).thenReturn(true);
         when(jwtProvider.createAccessToken(userName)).thenReturn(accessToken);
         when(jwtProvider.createRefreshToken(userName)).thenReturn(refreshToken);
@@ -91,7 +91,7 @@ class AuthServiceTest {
         String userName = "bss_test";
         LoginUserReqDto loginUserReqDto = new LoginUserReqDto(userName, "password");
 
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.empty());
+        when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> authService.login(loginUserReqDto))
@@ -119,7 +119,7 @@ class AuthServiceTest {
 
         LoginUserReqDto loginUserReqDto = new LoginUserReqDto(userName, password);
 
-        when(userRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+        when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(password, hashedPassword)).thenReturn(false);
 
         // when & then

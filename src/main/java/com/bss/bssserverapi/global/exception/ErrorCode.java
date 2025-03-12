@@ -18,7 +18,9 @@ public enum ErrorCode {
     INVALID_TOKEN("A008", "Token is invalid"),
 
     // business
-    STOCK_NOT_FOUND("B003", "Stock not found"),
+    STOCK_NOT_FOUND("B001", "Stock not found"),
+    RESEARCH_INVALID_DATE_RANGE("B002", "Start date must be before the end date."),
+    RESEARCH_DATE_RANGE_TOO_LONG("B003", "The date range must not exceed 180 days."),
 
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),

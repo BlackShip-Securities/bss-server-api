@@ -5,7 +5,7 @@ import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.User;
-import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +21,14 @@ import org.springframework.util.StringUtils;
 public class AuthService {
 
     private final AuthRepository authRepository;
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
 
     @Transactional
     public LoginUserResWithCookieDto login(final LoginUserReqDto loginUserReqDto){
 
-        User user = userRepository.findByUserName(loginUserReqDto.getUserName())
+        User user = userJpaRepository.findByUserName(loginUserReqDto.getUserName())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){

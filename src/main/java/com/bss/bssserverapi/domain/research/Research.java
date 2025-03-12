@@ -1,15 +1,18 @@
 package com.bss.bssserverapi.domain.research;
 
+import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Research extends DateTimeField {
 
@@ -49,5 +52,16 @@ public class Research extends DateTimeField {
     public void setUser(final User user) {
 
         this.user = user;
+    }
+
+    public static Research toEntity(CreateResearchReqDto getResearchResDto) {
+
+        return Research.builder()
+                .title(getResearchResDto.getTitle())
+                .content(getResearchResDto.getContent())
+                .targetPrice(getResearchResDto.getTargetPrice())
+                .dateStart(getResearchResDto.getDateStart())
+                .dateEnd(getResearchResDto.getDateEnd())
+                .build();
     }
 }

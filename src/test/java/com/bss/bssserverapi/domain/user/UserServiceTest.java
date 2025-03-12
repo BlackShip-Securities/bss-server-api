@@ -2,7 +2,7 @@ package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
-import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.doReturn;
 public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Spy
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -47,7 +47,7 @@ public class UserServiceTest {
                 .userName("bss_admin")
                 .password(bCryptPasswordEncoder.encode("Qq12341234@"))
                 .build())
-                .when(userRepository)
+                .when(userJpaRepository)
                 .save(any(User.class));
 
         // when
