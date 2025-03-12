@@ -47,13 +47,13 @@ public class UserControllerTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_test")
+                .userName("bss_test")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         SignupUserResDto res = SignupUserResDto.builder()
-                .userId("bss_test")
+                .userName("bss_test")
                 .build();
 
         given(userService.signupUser(any(SignupUserReqDto.class))).willReturn(res);
@@ -64,7 +64,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userId").value("bss_test"));
+                .andExpect(jsonPath("$.userName").value("bss_test"));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class UserControllerTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_test")
+                .userName("bss_test")
                 .password("invalidPW")
                 .passwordConfirmation("invalidPW")
                 .build();

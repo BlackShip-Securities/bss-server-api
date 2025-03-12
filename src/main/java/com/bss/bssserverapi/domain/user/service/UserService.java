@@ -4,7 +4,7 @@ import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.domain.user.dto.GetUserResDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
-import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserJpaRepository userJpaRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto){
 
-        if(userRepository.existsByUserId(signupUserReqDto.getUserId())){
+        if(userJpaRepository.existsByUserName(signupUserReqDto.getUserName())){
 
             throw new GlobalException(HttpStatus.CONFLICT, ErrorCode.USER_ALREADY_EXISTS);
         }
@@ -34,23 +34,23 @@ public class UserService {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
         }
 
-        User user = userRepository.save(User.builder()
-                .userId(signupUserReqDto.getUserId())
+        User user = userJpaRepository.save(User.builder()
+                .userName(signupUserReqDto.getUserName())
                 .password(bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()))
                 .build());
 
         return SignupUserResDto.builder()
-                .userId(user.getUserId())
+                .userName(user.getUserName())
                 .build();
     }
 
     public GetUserResDto getUser(final String userId){
 
-        User user = userRepository.findByUserId(userId)
+        User user = userJpaRepository.findByUserName(userId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         return GetUserResDto.builder()
-                .userId(user.getUserId())
+                .userName(user.getUserName())
                 .build();
     }
 }

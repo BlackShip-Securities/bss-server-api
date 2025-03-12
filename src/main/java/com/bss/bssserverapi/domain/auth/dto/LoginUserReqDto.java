@@ -13,16 +13,16 @@ public class LoginUserReqDto {
 
     @NotNull
     @Schema(example = "bss_test")
-    private String userId;
+    private String userName;
 
     @NotNull
     @Schema(example = "Qq12341234@")
     private String password;
 
     @Builder
-    public LoginUserReqDto(String userId, String password) {
+    public LoginUserReqDto(String userName, String password) {
 
-        this.userId = userId;
+        this.userName = userName;
         this.password = password;
     }
 }

@@ -16,7 +16,7 @@ public class SignupUserReqDto {
     @Pattern(regexp = "^[a-z0-9._]{4,30}$",
             message = "아이디는 4자리에서 30자리 사이의 영문 소문자, 숫자, 밑줄(_), 마침표(.)만 가능합니다.")
     @Schema(example = "bss_test")
-    private String userId;
+    private String userName;
 
     @NotNull
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,20}$",
@@ -31,8 +31,8 @@ public class SignupUserReqDto {
     private String passwordConfirmation;
 
     @Builder
-    public SignupUserReqDto(final String userId, final String password, final String passwordConfirmation) {
-        this.userId = userId;
+    public SignupUserReqDto(final String userName, final String password, final String passwordConfirmation) {
+        this.userName = userName;
         this.password = password;
         this.passwordConfirmation = passwordConfirmation;
     }

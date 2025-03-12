@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.validateToken(refreshToken);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                jwtProvider.getUserId(refreshToken),
+                jwtProvider.getUserName(refreshToken),
                 null,
                 null);
         SecurityContextHolder.getContext().setAuthentication(authentication);

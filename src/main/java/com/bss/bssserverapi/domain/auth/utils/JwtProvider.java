@@ -35,9 +35,9 @@ public class JwtProvider {
         return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().getExpiration();
     }
 
-    public String getUserId(final String token){
+    public String getUserName(final String token){
 
-        return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().get("userId", String.class);
+        return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().get("userName", String.class);
     }
 
     public String getType(final String token){
@@ -50,10 +50,10 @@ public class JwtProvider {
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
     }
 
-    public String createAccessToken(final String userId){
+    public String createAccessToken(final String userName){
 
         return Jwts.builder()
-                .claim("userId", userId)
+                .claim("userName", userName)
                 .claim("type", "accessToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + this.accessTokenExpiredTime))
@@ -61,10 +61,10 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createRefreshToken(final String userId){
+    public String createRefreshToken(final String userName){
 
         return Jwts.builder()
-                .claim("userId", userId)
+                .claim("userName", userName)
                 .claim("type", "refreshToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + this.refreshTokenExpiredTime))
@@ -72,7 +72,7 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createTamperedAccessToken(String originalToken, String newUserId) {
+    public String createTamperedAccessToken(String originalToken, String newUserName) {
 
         String[] tokenParts = originalToken.split("\\.");
 
@@ -80,7 +80,7 @@ public class JwtProvider {
         String payloadJson = new String(Base64.getUrlDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
 
         // 2. userId 값을 변경
-        payloadJson = payloadJson.replace("\"userId\":\"bss_test\"", "\"userId\":\"" + newUserId + "\"");
+        payloadJson = payloadJson.replace("\"userName\":\"bss_test\"", "\"userName\":\"" + newUserName + "\"");
 
         // 3. 변조된 Payload를 다시 Base64로 인코딩
         String tamperedPayload = Base64.getUrlEncoder().withoutPadding().encodeToString(payloadJson.getBytes(StandardCharsets.UTF_8));
@@ -89,10 +89,10 @@ public class JwtProvider {
         return tokenParts[0] + "." + tamperedPayload + "." + tokenParts[2];
     }
 
-    public String createExpiredAccessToken(final String userId){
+    public String createExpiredAccessToken(final String userName){
 
         return Jwts.builder()
-                .claim("userId", userId)
+                .claim("userName", userName)
                 .claim("type", "accessToken")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() - 1))

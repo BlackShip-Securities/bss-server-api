@@ -2,7 +2,7 @@ package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
-import com.bss.bssserverapi.domain.user.repository.UserRepository;
+import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.domain.user.service.UserService;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.doReturn;
 public class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Spy
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -38,23 +38,23 @@ public class UserServiceTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         doReturn(User.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
                 .password(bCryptPasswordEncoder.encode("Qq12341234@"))
                 .build())
-                .when(userRepository)
+                .when(userJpaRepository)
                 .save(any(User.class));
 
         // when
         SignupUserResDto res = userService.signupUser(req);
 
         // then
-        assertThat(res.getUserId()).isEqualTo(req.getUserId());
+        assertThat(res.getUserName()).isEqualTo(req.getUserName());
     }
 
     @Test
@@ -63,7 +63,8 @@ public class UserServiceTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
+                .userName("bss_admin")
                 .password("Qq12341234@!!!!!!!!!!!!")
                 .passwordConfirmation("Qq12341234@")
                 .build();

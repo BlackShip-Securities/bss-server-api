@@ -14,7 +14,7 @@ public class Auth {
 
     @Id
     @Column(nullable = false, length = 255, unique = true)
-    private String userId;
+    private String userName;
 
     @Column(nullable = false, length = 512)
     private String refreshToken;
@@ -23,9 +23,9 @@ public class Auth {
     private Date expiredTime;
 
     @Builder
-    public Auth(final String userId, final String refreshToken, final Date expiredTime) {
+    public Auth(final String userName, final String refreshToken, final Date expiredTime) {
 
-        this.userId = userId;
+        this.userName = userName;
         this.refreshToken = refreshToken;
         this.expiredTime = expiredTime;
     }

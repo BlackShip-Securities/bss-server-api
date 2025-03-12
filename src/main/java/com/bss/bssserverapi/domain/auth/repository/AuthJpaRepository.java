@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface AuthJpaRepository extends JpaRepository<Auth, String> {
 
-    Optional<Auth> findAuthByUserId(final String userId);
+    Optional<Auth> findAuthByUserName(final String userName);
+    void deleteByUserName(final String userName);
 }
