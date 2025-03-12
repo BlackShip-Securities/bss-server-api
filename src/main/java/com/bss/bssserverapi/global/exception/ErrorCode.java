@@ -18,6 +18,8 @@ public enum ErrorCode {
     INVALID_TOKEN("A008", "Token is invalid"),
 
     // business
+    STOCK_NOT_FOUND("B003", "Stock not found"),
+
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
     ;
