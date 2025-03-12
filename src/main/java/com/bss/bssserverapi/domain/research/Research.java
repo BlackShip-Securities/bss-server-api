@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,6 +41,9 @@ public class Research extends DateTimeField {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "research", cascade = CascadeType.PERSIST)
+    private List<ResearchTag> researchTagList = new ArrayList<>();
+
     @Builder
     public Research(final String title, final String content, final Long targetPrice, final LocalDate dateStart, final LocalDate dateEnd) {
 
@@ -52,6 +57,12 @@ public class Research extends DateTimeField {
     public void setUser(final User user) {
 
         this.user = user;
+    }
+
+    public void addResearchTag(final ResearchTag researchTag) {
+
+        researchTag.setResearch(this);
+        this. researchTagList.add(researchTag);
     }
 
     public static Research toEntity(CreateResearchReqDto getResearchResDto) {
