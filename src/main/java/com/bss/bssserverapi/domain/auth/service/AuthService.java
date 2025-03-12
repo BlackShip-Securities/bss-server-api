@@ -28,7 +28,7 @@ public class AuthService {
     @Transactional
     public LoginUserResWithCookieDto login(final LoginUserReqDto loginUserReqDto){
 
-        User user = userRepository.findByUserId(loginUserReqDto.getUserId())
+        User user = userRepository.findByUserName(loginUserReqDto.getUserName())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
@@ -36,16 +36,16 @@ public class AuthService {
             throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.PASSWORD_MISMATCH);
         }
 
-        String accessToken = jwtProvider.createAccessToken(user.getUserId());
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserId());
+        String accessToken = jwtProvider.createAccessToken(user.getUserName());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserName());
 
-        authRepository.deleteByUserId(user.getUserId());
-        authRepository.save(user.getUserId(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
+        authRepository.deleteByUserName(user.getUserName());
+        authRepository.save(user.getUserName(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
 
         return LoginUserResWithCookieDto.builder()
                 .cookie(CookieProvider.createResponseCookie(refreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
                 .loginUserResDto(LoginUserResDto.builder()
-                        .userId(user.getUserId())
+                        .userName(user.getUserName())
                         .accessToken(accessToken)
                         .build())
                 .build();
@@ -61,12 +61,12 @@ public class AuthService {
 
         jwtProvider.validateToken(refreshToken);
 
-        String userId = jwtProvider.getUserId(refreshToken);
-        String accessToken = jwtProvider.createAccessToken(userId);
-        String newRefreshToken = jwtProvider.createRefreshToken(userId);
+        String userName = jwtProvider.getUserName(refreshToken);
+        String accessToken = jwtProvider.createAccessToken(userName);
+        String newRefreshToken = jwtProvider.createRefreshToken(userName);
 
-        authRepository.deleteByUserId(userId);
-        authRepository.save(userId, newRefreshToken, jwtProvider.getExpiredDate(newRefreshToken));
+        authRepository.deleteByUserName(userName);
+        authRepository.save(userName, newRefreshToken, jwtProvider.getExpiredDate(newRefreshToken));
 
         return RefreshTokenResWithCookieDto.builder()
                 .cookie(CookieProvider.createResponseCookie(newRefreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000))
@@ -77,9 +77,9 @@ public class AuthService {
     }
 
     @Transactional
-    public LogoutUserResDto logout(final String userId){
+    public LogoutUserResDto logout(final String userName){
 
-        authRepository.deleteByUserId(userId);
+        authRepository.deleteByUserName(userName);
 
         return LogoutUserResDto.builder()
                 .cookie(CookieProvider.deleteResponseCookie())

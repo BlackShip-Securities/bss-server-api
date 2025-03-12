@@ -38,13 +38,13 @@ public class UserServiceTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         doReturn(User.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
                 .password(bCryptPasswordEncoder.encode("Qq12341234@"))
                 .build())
                 .when(userRepository)
@@ -54,7 +54,7 @@ public class UserServiceTest {
         SignupUserResDto res = userService.signupUser(req);
 
         // then
-        assertThat(res.getUserId()).isEqualTo(req.getUserId());
+        assertThat(res.getUserName()).isEqualTo(req.getUserName());
     }
 
     @Test
@@ -63,7 +63,8 @@ public class UserServiceTest {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userId("bss_admin")
+                .userName("bss_admin")
+                .userName("bss_admin")
                 .password("Qq12341234@!!!!!!!!!!!!")
                 .passwordConfirmation("Qq12341234@")
                 .build();

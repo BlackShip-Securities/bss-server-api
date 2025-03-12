@@ -14,24 +14,24 @@ public class AuthRepositoryImpl implements AuthRepository{
     private final AuthJpaRepository authJpaRepository;
 
     @Override
-    public void save(final String userId, final String refreshToken, final Date expiredDate) {
+    public void save(final String userName, final String refreshToken, final Date expiredDate) {
 
         authJpaRepository.save(Auth.builder()
-                .userId(userId)
+                .userName(userName)
                 .refreshToken(refreshToken)
                 .expiredTime(expiredDate)
                 .build());
     }
 
     @Override
-    public Optional<Auth> findAuthByUserId(final String userId) {
+    public Optional<Auth> findAuthByUserName(final String userName) {
 
-        return authJpaRepository.findAuthByUserId(userId);
+        return authJpaRepository.findAuthByUserName(userName);
     }
 
     @Override
-    public void deleteByUserId(final String userId) {
+    public void deleteByUserName(final String userName) {
 
-        authJpaRepository.deleteById(userId);
+        authJpaRepository.deleteByUserName(userName);
     }
 }

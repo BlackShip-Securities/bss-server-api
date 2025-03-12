@@ -53,7 +53,7 @@ public class AuthControllerTest {
 
         // given
         LoginUserReqDto req = LoginUserReqDto.builder()
-                .userId("bss_test")
+                .userName("bss_test")
                 .password("Qq12341234@")
                 .build();
 
@@ -61,7 +61,7 @@ public class AuthControllerTest {
                 .cookie(CookieProvider.createResponseCookie("rt_test", 0L))
                 .loginUserResDto(LoginUserResDto.builder()
                         .accessToken("at_test")
-                        .userId("bss_test")
+                        .userName("bss_test")
                         .build())
                 .build();
 
@@ -73,7 +73,7 @@ public class AuthControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value("bss_test"))
+                .andExpect(jsonPath("$.userName").value("bss_test"))
                 .andExpect(jsonPath("$.accessToken").value("at_test"))
                 .andExpect(cookie().exists("refresh_token"))
                 .andExpect(cookie().value("refresh_token", "rt_test"));

@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface AuthRepository {
 
-    void save(final String userId, final String token, final Date expiredDate);
+    void save(final String userName, final String token, final Date expiredDate);
 
-    Optional<Auth> findAuthByUserId(final String userId);
+    Optional<Auth> findAuthByUserName(final String userName);
 
-    void deleteByUserId(final String userId);
+    void deleteByUserName(final String userName);
 }

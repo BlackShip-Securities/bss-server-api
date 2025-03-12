@@ -24,7 +24,7 @@ public class UserService {
     @Transactional
     public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto){
 
-        if(userRepository.existsByUserId(signupUserReqDto.getUserId())){
+        if(userRepository.existsByUserName(signupUserReqDto.getUserName())){
 
             throw new GlobalException(HttpStatus.CONFLICT, ErrorCode.USER_ALREADY_EXISTS);
         }
@@ -35,22 +35,22 @@ public class UserService {
         }
 
         User user = userRepository.save(User.builder()
-                .userId(signupUserReqDto.getUserId())
+                .userName(signupUserReqDto.getUserName())
                 .password(bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()))
                 .build());
 
         return SignupUserResDto.builder()
-                .userId(user.getUserId())
+                .userName(user.getUserName())
                 .build();
     }
 
     public GetUserResDto getUser(final String userId){
 
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserName(userId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         return GetUserResDto.builder()
-                .userId(user.getUserId())
+                .userName(user.getUserName())
                 .build();
     }
 }

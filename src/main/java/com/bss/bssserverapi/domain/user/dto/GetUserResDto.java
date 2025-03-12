@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class GetUserResDto {
 
-    private String userId;
+    private String userName;
 
     @Builder
-    public GetUserResDto(String userId) {
+    public GetUserResDto(String userName) {
 
-        this.userId = userId;
+        this.userName = userName;
     }
 }

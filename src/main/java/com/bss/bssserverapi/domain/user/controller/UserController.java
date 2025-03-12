@@ -26,10 +26,10 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<GetUserResDto> getUser(@AuthenticationPrincipal final String userId) {
+    public ResponseEntity<GetUserResDto> getUser(@AuthenticationPrincipal final String userName) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(userService.getUser(userId));
+                .body(userService.getUser(userName));
     }
 }
