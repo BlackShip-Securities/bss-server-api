@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface StockRepository {
 
+    Optional<Stock> findStockById(final Long id);
     Optional<Stock> findStockByName(final String name);
     Optional<Stock> findStockByStockCode(final String stockCode);
 }

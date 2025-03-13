@@ -1,11 +1,11 @@
 package com.bss.bssserverapi.domain.research;
 
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
+import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,11 +41,14 @@ public class Research extends DateTimeField {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "stock_id")
+    private Stock stock;
+
     @OneToMany(mappedBy = "research", cascade = CascadeType.PERSIST)
     private List<ResearchTag> researchTagList = new ArrayList<>();
 
-    @Builder
-    public Research(final String title, final String content, final Long targetPrice, final LocalDate dateStart, final LocalDate dateEnd) {
+    public Research(String title, String content, Long targetPrice, LocalDate dateStart, LocalDate dateEnd) {
 
         this.title = title;
         this.content = content;
@@ -54,25 +57,29 @@ public class Research extends DateTimeField {
         this.dateEnd = dateEnd;
     }
 
+    public static Research toEntity(CreateResearchReqDto getResearchResDto) {
+
+        return new Research(
+                getResearchResDto.getTitle(),
+                getResearchResDto.getContent(),
+                getResearchResDto.getTargetPrice(),
+                getResearchResDto.getDateStart(),
+                getResearchResDto.getDateEnd());
+    }
+
     public void setUser(final User user) {
 
         this.user = user;
     }
 
+    public void setStock(final Stock stock){
+
+        this.stock = stock;
+    }
+
     public void addResearchTag(final ResearchTag researchTag) {
 
         researchTag.setResearch(this);
-        this. researchTagList.add(researchTag);
-    }
-
-    public static Research toEntity(CreateResearchReqDto getResearchResDto) {
-
-        return Research.builder()
-                .title(getResearchResDto.getTitle())
-                .content(getResearchResDto.getContent())
-                .targetPrice(getResearchResDto.getTargetPrice())
-                .dateStart(getResearchResDto.getDateStart())
-                .dateEnd(getResearchResDto.getDateEnd())
-                .build();
+        this.researchTagList.add(researchTag);
     }
 }

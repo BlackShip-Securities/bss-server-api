@@ -13,6 +13,12 @@ public class StockRepositoryImpl implements StockRepository{
     private final StockJpaRepository stockJpaRepository;
 
     @Override
+    public Optional<Stock> findStockById(Long id) {
+
+        return stockJpaRepository.findById(id);
+    }
+
+    @Override
     public Optional<Stock> findStockByName(String name) {
 
         return stockJpaRepository.findStockByName(name);

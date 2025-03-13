@@ -19,8 +19,10 @@ public enum ErrorCode {
 
     // business
     STOCK_NOT_FOUND("B001", "Stock not found"),
-    RESEARCH_INVALID_DATE_RANGE("B002", "Start date must be before the end date."),
-    RESEARCH_DATE_RANGE_TOO_LONG("B003", "The date range must not exceed 180 days."),
+    RESEARCH_INVALID_DATE_RANGE("B002", "Start date must be before the end date"),
+    RESEARCH_DATE_RANGE_TOO_LONG("B003", "The date range must not exceed 180 days"),
+    RESEARCH_TAG_LIMIT_EXCEEDED("B004", "A research can have up to 5 unique tags"),
+    RESEARCH_TAG_DUPLICATED("B005", "Tags must be unique"),
 
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),

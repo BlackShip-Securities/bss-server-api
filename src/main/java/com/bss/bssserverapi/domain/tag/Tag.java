@@ -31,7 +31,6 @@ public class Tag {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST)
     private List<ResearchTag> researchTagList = new ArrayList<>();
 
-    @Builder
     public Tag(final String name) {
 
         this.name = name;
