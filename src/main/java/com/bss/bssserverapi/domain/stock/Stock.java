@@ -31,6 +31,7 @@ public class Stock {
     @OneToMany(mappedBy = "stock", cascade = CascadeType.PERSIST)
     private List<Research> researchList = new ArrayList<>();
 
+    @Builder
     public Stock(String stockCode, String name, Long marketCap) {
 
         this.stockCode = stockCode;
