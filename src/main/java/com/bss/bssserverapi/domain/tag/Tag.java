@@ -21,7 +21,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 25)
+    @Column(unique = true, nullable = false, length = 255)
     private String name;
 
     @CreatedDate
@@ -31,7 +31,6 @@ public class Tag {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.PERSIST)
     private List<ResearchTag> researchTagList = new ArrayList<>();
 
-    @Builder
     public Tag(final String name) {
 
         this.name = name;

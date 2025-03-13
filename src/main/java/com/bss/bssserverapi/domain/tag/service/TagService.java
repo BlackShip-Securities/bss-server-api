@@ -9,9 +9,4 @@ import org.springframework.stereotype.Service;
 public class TagService {
 
     private final TagJpaRepository tagJpaRepository;
-
-    public boolean existTagByName(final String name) {
-
-        return tagJpaRepository.existsTagByName(name);
-    }
 }

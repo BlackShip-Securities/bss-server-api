@@ -3,10 +3,11 @@ package com.bss.bssserverapi.domain.research;
 import com.bss.bssserverapi.domain.tag.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class ResearchTag {
 
     @Id
