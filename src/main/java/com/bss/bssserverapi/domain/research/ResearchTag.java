@@ -3,9 +3,10 @@ package com.bss.bssserverapi.domain.research;
 import com.bss.bssserverapi.domain.tag.Tag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class ResearchTag {

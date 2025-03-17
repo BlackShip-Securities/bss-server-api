@@ -8,20 +8,18 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-public class GetResearchResDto {
+public class GetResearchPreviewResDto {
 
     private final String title;
-    private final String content;
     private final Long targetPrice;
     private final LocalDate dateStart;
     private final LocalDate dateEnd;
     private final String userName;
     private final List<String> tagNameList;
 
-    public GetResearchResDto(final String title, final String content, final Long targetPrice, final LocalDate dateStart, final LocalDate dateEnd, final String userName, final List<String> tagNameList) {
+    public GetResearchPreviewResDto(final String title, final Long targetPrice, final LocalDate dateStart, final LocalDate dateEnd, final String userName, final List<String> tagNameList) {
 
         this.title = title;
-        this.content = content;
         this.targetPrice = targetPrice;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
@@ -29,11 +27,10 @@ public class GetResearchResDto {
         this.tagNameList = tagNameList;
     }
 
-    public static GetResearchResDto toDto(final Research research, final List<Tag> tagList) {
+    public static GetResearchPreviewResDto toDto(final Research research, final List<Tag> tagList) {
 
-        return new GetResearchResDto(
+        return new GetResearchPreviewResDto(
                 research.getTitle(),
-                research.getContent(),
                 research.getTargetPrice(),
                 research.getDateStart(),
                 research.getDateEnd(),
