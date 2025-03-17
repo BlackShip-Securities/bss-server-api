@@ -23,10 +23,10 @@ public class ResearchController {
     public ResponseEntity<GetResearchResDto> createResearch(
             @AuthenticationPrincipal final String userName,
             @RequestBody @Valid final CreateResearchReqDto createResearchReqDto) {
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(researchService.createResearch(userName, createResearchReqDto));
+        throw new RuntimeException();
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .body(researchService.createResearch(userName, createResearchReqDto));
     }
 
     @GetMapping("stocks/{stock-id}/researches")

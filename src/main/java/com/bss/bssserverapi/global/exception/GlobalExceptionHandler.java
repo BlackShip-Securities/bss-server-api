@@ -30,6 +30,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorCode.UNKNOWN_SERVER_ERROR);
+                .body(e.getMessage());
     }
 }
