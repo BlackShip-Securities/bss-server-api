@@ -3,6 +3,7 @@ package com.bss.bssserverapi.domain.research.service;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.research.ResearchTag;
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
+import com.bss.bssserverapi.domain.research.dto.GetResearchPagingResDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchResDto;
 import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
 import com.bss.bssserverapi.domain.stock.Stock;
@@ -14,6 +15,8 @@ import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,5 +97,16 @@ public class ResearchService {
 
         return tagJpaRepository.findTagByName(tagName)
                 .orElseGet(() -> tagJpaRepository.save(new Tag(tagName)));
+    }
+
+    public GetResearchPagingResDto getResearchPagingList(final Long stockId, final Pageable pageable) {
+
+        Slice<GetResearchResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)
+                .map(GetResearchResDto::toDto);
+
+        return GetResearchPagingResDto.builder()
+                .getResearchResDtoList(slice.getContent())
+                .hasNext(slice.hasNext())
+                .build();
     }
 }
