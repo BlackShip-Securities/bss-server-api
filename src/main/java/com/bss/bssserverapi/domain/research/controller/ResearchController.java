@@ -23,19 +23,29 @@ public class ResearchController {
     public ResponseEntity<GetResearchResDto> createResearch(
             @AuthenticationPrincipal final String userName,
             @RequestBody @Valid final CreateResearchReqDto createResearchReqDto) {
-        throw new RuntimeException();
-//        return ResponseEntity
-//                .status(HttpStatus.CREATED)
-//                .body(researchService.createResearch(userName, createResearchReqDto));
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(researchService.createResearch(userName, createResearchReqDto));
     }
 
-    @GetMapping("stocks/{stock-id}/researches")
-    public ResponseEntity<GetResearchPagingResDto> getResearchPagingList(
+    @GetMapping("/stocks/{stock-id}/researches")
+    public ResponseEntity<GetResearchPagingResDto> getResearchPagingByStock(
             @PathVariable("stock-id") final Long stockId,
             final Pageable pageable) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(researchService.getResearchPagingList(stockId, pageable));
+                .body(researchService.getResearchPagingByStock(stockId, pageable));
+    }
+
+    @GetMapping("/users/{user-name}/researches")
+    public ResponseEntity<GetResearchPagingResDto> getResearchPagingByUser(
+            @PathVariable("user-name") final String userName,
+            final Pageable pageable) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(researchService.getResearchPagingByUser(userName, pageable));
     }
 }
