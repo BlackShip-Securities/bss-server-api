@@ -4,8 +4,10 @@ import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.research.ResearchTag;
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchPagingResDto;
+import com.bss.bssserverapi.domain.research.dto.GetResearchPreviewResDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchResDto;
 import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
+import com.bss.bssserverapi.domain.research.repository.ResearchTagRepository;
 import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.stock.repository.StockRepository;
 import com.bss.bssserverapi.domain.tag.Tag;
@@ -22,19 +24,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ResearchService {
 
     private final ResearchJpaRepository researchJpaRepository;
+    private final ResearchTagRepository researchTagRepository;
+    private final TagJpaRepository tagJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final StockRepository stockRepository;
-    private final TagJpaRepository tagJpaRepository;
 
     @Transactional
     public GetResearchResDto createResearch(final String userName, final CreateResearchReqDto createResearchReqDto){
@@ -48,9 +48,9 @@ public class ResearchService {
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.STOCK_NOT_FOUND));
 
         Research research = this.createResearchEntity(createResearchReqDto, user, stock);
-        this.addTagsToResearch(research, createResearchReqDto.getTagNameList());
+        List<Tag> tagList = this.createTagsAndAddToResearch(research, createResearchReqDto.getTagNameList());
 
-        return GetResearchResDto.toDto(researchJpaRepository.save(research));
+        return GetResearchResDto.toDto(researchJpaRepository.save(research), tagList);
     }
 
     private void validateDateRange(final LocalDate dateStart, final LocalDate dateEnd) {
@@ -83,14 +83,19 @@ public class ResearchService {
         return research;
     }
 
-    private void addTagsToResearch(final Research research, final List<String> tagNameList) {
+    private List<Tag> createTagsAndAddToResearch(final Research research, final List<String> tagNameList) {
+
+        List<Tag> tagList = new ArrayList<>();
 
         for(String tagName : tagNameList) {
             Tag tag = this.getOrCreateTag(tagName);
+            tagList.add(tag);
             ResearchTag researchTag = new ResearchTag();
             research.addResearchTag(researchTag);
             tag.addResearchTag(researchTag);
         }
+
+        return tagList;
     }
 
     private Tag getOrCreateTag(final String tagName) {
@@ -99,13 +104,21 @@ public class ResearchService {
                 .orElseGet(() -> tagJpaRepository.save(new Tag(tagName)));
     }
 
+    @Transactional(readOnly = true)
     public GetResearchPagingResDto getResearchPagingList(final Long stockId, final Pageable pageable) {
 
-        Slice<GetResearchResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)
-                .map(GetResearchResDto::toDto);
+        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)
+                .map(research -> {
+                    List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
+                            .stream()
+                            .map(researchTag -> tagJpaRepository.findById(researchTag.getTag().getId()).orElseGet(null))
+                            .filter(Objects::nonNull)
+                            .toList();
+                    return GetResearchPreviewResDto.toDto(research, tagList);
+                });
 
         return GetResearchPagingResDto.builder()
-                .getResearchResDtoList(slice.getContent())
+                .getResearchPreviewResDtoList(slice.getContent())
                 .hasNext(slice.hasNext())
                 .build();
     }

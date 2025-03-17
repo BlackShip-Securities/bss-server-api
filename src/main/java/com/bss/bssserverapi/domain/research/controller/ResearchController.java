@@ -1,7 +1,6 @@
 package com.bss.bssserverapi.domain.research.controller;
 
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
-import com.bss.bssserverapi.domain.research.dto.GetResearchPagingReqDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchPagingResDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchResDto;
 import com.bss.bssserverapi.domain.research.service.ResearchService;
