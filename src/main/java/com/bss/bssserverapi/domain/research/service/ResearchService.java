@@ -105,9 +105,31 @@ public class ResearchService {
     }
 
     @Transactional(readOnly = true)
-    public GetResearchPagingResDto getResearchPagingList(final Long stockId, final Pageable pageable) {
+    public GetResearchPagingResDto getResearchPagingByStock(final Long stockId, final Pageable pageable) {
 
         Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)
+                .map(research -> {
+                    List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
+                            .stream()
+                            .map(researchTag -> tagJpaRepository.findById(researchTag.getTag().getId()).orElseGet(null))
+                            .filter(Objects::nonNull)
+                            .toList();
+                    return GetResearchPreviewResDto.toDto(research, tagList);
+                });
+
+        return GetResearchPagingResDto.builder()
+                .getResearchPreviewResDtoList(slice.getContent())
+                .hasNext(slice.hasNext())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public GetResearchPagingResDto getResearchPagingByUser(final String stockId, final Pageable pageable) {
+
+        User user = userJpaRepository.findByUserName(stockId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByUserId(user.getId(), pageable)
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
