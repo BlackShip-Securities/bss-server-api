@@ -126,7 +126,6 @@ public class ResearchService {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
                             .map(researchTag -> researchTag.getTag())
-                            .filter(Objects::nonNull)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
                 });
@@ -148,7 +147,6 @@ public class ResearchService {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
                             .map(researchTag -> researchTag.getTag())
-                            .filter(Objects::nonNull)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
                 });
