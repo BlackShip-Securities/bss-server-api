@@ -105,6 +105,20 @@ public class ResearchService {
     }
 
     @Transactional(readOnly = true)
+    public GetResearchResDto getResearch(final Long researchId){
+
+        Research research = researchJpaRepository.findById(researchId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.RESEARCH_NOT_FOUND));
+
+        List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(researchId)
+                .stream()
+                .map(researchTag -> researchTag.getTag())
+                .toList();
+
+        return GetResearchResDto.toDto(research, tagList);
+    }
+
+    @Transactional(readOnly = true)
     public GetResearchPagingResDto getResearchPagingByStock(final Long stockId, final Pageable pageable) {
 
         Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)

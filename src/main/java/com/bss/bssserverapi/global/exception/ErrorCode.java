@@ -23,6 +23,8 @@ public enum ErrorCode {
     RESEARCH_DATE_RANGE_TOO_LONG("B003", "The date range must not exceed 180 days"),
     RESEARCH_TAG_LIMIT_EXCEEDED("B004", "A research can have up to 5 unique tags"),
     RESEARCH_TAG_DUPLICATED("B005", "Tags must be unique"),
+    RESEARCH_NOT_FOUND("B006", "Research not found"),
+
 
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
