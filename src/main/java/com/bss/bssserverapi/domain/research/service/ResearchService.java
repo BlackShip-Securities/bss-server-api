@@ -140,9 +140,9 @@ public class ResearchService {
     }
 
     @Transactional(readOnly = true)
-    public GetResearchPagingResDto getResearchPagingByUser(final String stockId, final Pageable pageable) {
+    public GetResearchPagingResDto getResearchPagingByUser(final String userName, final Pageable pageable) {
 
-        User user = userJpaRepository.findByUserName(stockId)
+        User user = userJpaRepository.findByUserName(userName)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByUserId(user.getId(), pageable)
