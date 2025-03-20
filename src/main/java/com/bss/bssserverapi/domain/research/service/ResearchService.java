@@ -125,7 +125,7 @@ public class ResearchService {
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
-                            .map(researchTag -> tagJpaRepository.findById(researchTag.getTag().getId()).orElseGet(null))
+                            .map(researchTag -> researchTag.getTag())
                             .filter(Objects::nonNull)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
@@ -147,7 +147,7 @@ public class ResearchService {
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
-                            .map(researchTag -> tagJpaRepository.findById(researchTag.getTag().getId()).orElseGet(null))
+                            .map(researchTag -> researchTag.getTag())
                             .filter(Objects::nonNull)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
