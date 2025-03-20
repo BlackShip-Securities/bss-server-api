@@ -28,6 +28,8 @@ public class Research extends DateTimeField {
     @Column(nullable = false)
     private String content;
 
+    private Long recommendCount = 0L;
+
     @Column(nullable = false)
     private Long targetPrice;
 
@@ -81,5 +83,15 @@ public class Research extends DateTimeField {
 
         researchTag.setResearch(this);
         this.researchTagList.add(researchTag);
+    }
+
+    public void addRecommend(){
+
+        this.recommendCount++;
+    }
+
+    public void minusRecommend(){
+
+        this.recommendCount--;
     }
 }

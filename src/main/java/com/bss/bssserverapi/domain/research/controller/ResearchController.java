@@ -56,4 +56,16 @@ public class ResearchController {
                 .status(HttpStatus.OK)
                 .body(researchService.getResearchPagingByUser(userName, pageable));
     }
+
+    @PatchMapping("/researches/{researchId}/recommend")
+    public ResponseEntity<?> updateResearchRecommend(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("researchId") final Long researchId) {
+
+        researchService.updateResearchRecommend(userName, researchId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
 }

@@ -1,12 +1,14 @@
 package com.bss.bssserverapi.domain.research.service;
 
 import com.bss.bssserverapi.domain.research.Research;
+import com.bss.bssserverapi.domain.research.ResearchRecommend;
 import com.bss.bssserverapi.domain.research.ResearchTag;
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchPagingResDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchPreviewResDto;
 import com.bss.bssserverapi.domain.research.dto.GetResearchResDto;
 import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
+import com.bss.bssserverapi.domain.research.repository.ResearchRecommendJpaRepository;
 import com.bss.bssserverapi.domain.research.repository.ResearchTagRepository;
 import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.stock.repository.StockRepository;
@@ -32,6 +34,7 @@ public class ResearchService {
 
     private final ResearchJpaRepository researchJpaRepository;
     private final ResearchTagRepository researchTagRepository;
+    private final ResearchRecommendJpaRepository researchRecommendJpaRepository;
     private final TagJpaRepository tagJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final StockRepository stockRepository;
@@ -155,5 +158,28 @@ public class ResearchService {
                 .getResearchPreviewResDtoList(slice.getContent())
                 .hasNext(slice.hasNext())
                 .build();
+    }
+
+    @Transactional
+    public void updateResearchRecommend(final String userName, final Long researchId) {
+
+        final User user = userJpaRepository.findByUserName(userName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        final Research research = researchJpaRepository.findById(researchId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.RESEARCH_NOT_FOUND));
+
+        ResearchRecommend researchRecommend = this.getOrCreateResearchRecommend(user, research);
+
+        researchRecommend.updateRecommend();
+    }
+
+    private ResearchRecommend getOrCreateResearchRecommend(final User user, final Research research ) {
+
+        return researchRecommendJpaRepository.findByUserIdAndResearchId(user.getId(), research.getId())
+                .orElseGet(() -> researchRecommendJpaRepository.save(ResearchRecommend.builder()
+                        .recommend(Boolean.TRUE)
+                        .user(user)
+                        .research(research)
+                        .build()));
     }
 }
