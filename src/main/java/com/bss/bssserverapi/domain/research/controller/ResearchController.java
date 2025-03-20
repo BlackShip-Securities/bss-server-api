@@ -29,9 +29,17 @@ public class ResearchController {
                 .body(researchService.createResearch(userName, createResearchReqDto));
     }
 
-    @GetMapping("/stocks/{stock-id}/researches")
+    @GetMapping("/researches/{researchId}")
+    public ResponseEntity<GetResearchResDto> getResearch(@PathVariable("researchId") final Long researchId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(researchService.getResearch(researchId));
+    }
+
+    @GetMapping("/stocks/{stockId}/researches")
     public ResponseEntity<GetResearchPagingResDto> getResearchPagingByStock(
-            @PathVariable("stock-id") final Long stockId,
+            @PathVariable("stockId") final Long stockId,
             final Pageable pageable) {
 
         return ResponseEntity
@@ -39,9 +47,9 @@ public class ResearchController {
                 .body(researchService.getResearchPagingByStock(stockId, pageable));
     }
 
-    @GetMapping("/users/{user-name}/researches")
+    @GetMapping("/users/{userName}/researches")
     public ResponseEntity<GetResearchPagingResDto> getResearchPagingByUser(
-            @PathVariable("user-name") final String userName,
+            @PathVariable("userName") final String userName,
             final Pageable pageable) {
 
         return ResponseEntity
