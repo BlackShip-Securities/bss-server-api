@@ -177,7 +177,7 @@ public class ResearchService {
 
         return researchRecommendJpaRepository.findByUserIdAndResearchId(user.getId(), research.getId())
                 .orElseGet(() -> researchRecommendJpaRepository.save(ResearchRecommend.builder()
-                        .recommend(Boolean.TRUE)
+                        .recommend(Boolean.FALSE)
                         .user(user)
                         .research(research)
                         .build()));
