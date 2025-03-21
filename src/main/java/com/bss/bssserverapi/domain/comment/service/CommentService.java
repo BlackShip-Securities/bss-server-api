@@ -37,6 +37,8 @@ public class CommentService {
                 .research(research)
                 .build();
 
+        research.addComment();
+
         return GetCommentResDto.toDto(commentJpaRepository.save(comment));
     }
 
@@ -57,6 +59,7 @@ public class CommentService {
                 .build();
 
         comment.setParentComment(parentComment);
+        research.addComment();
 
         return GetCommentResDto.toDto(commentJpaRepository.save(comment));
     }
