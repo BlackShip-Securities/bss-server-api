@@ -4,7 +4,10 @@ import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,7 @@ public class Comment extends DateTimeField {
     @OneToMany(mappedBy = "parentComment")
     private List<Comment> childCommentList = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
@@ -44,5 +47,17 @@ public class Comment extends DateTimeField {
         this.content = content;
         this.user = user;
         this.research = research;
+    }
+
+    public void setParentComment(final Comment parentComment){
+
+        this.parentComment = parentComment;
+        this.parentComment.addChildContent(this);
+    }
+
+    public void addChildContent(final Comment childComment){
+
+        this.childCommentList.add(childComment);
+        this.childCommentCount++;
     }
 }

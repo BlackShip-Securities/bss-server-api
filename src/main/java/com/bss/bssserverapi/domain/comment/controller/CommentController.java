@@ -16,6 +16,9 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    /**
+     * 댓글 작성
+     * */
     @PostMapping("/researches/{researchId}/comments")
     public ResponseEntity<GetCommentResDto> createComment(
             @AuthenticationPrincipal final String userName,
@@ -25,5 +28,20 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(commentService.createComment(userName, researchId, createCommentReqDto));
+    }
+
+    /**
+     * 답글(대댓글) 작성
+     * */
+    @PostMapping("/researches/{researchId}/comments/{commentId}/replyComments")
+    public ResponseEntity<GetCommentResDto> createReplyComment(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("researchId") final Long researchId,
+            @PathVariable("commentId") final Long commentId,
+            @RequestBody final CreateCommentReqDto createCommentReqDto) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(commentService.createReplyComment(userName, researchId, commentId, createCommentReqDto));
     }
 }

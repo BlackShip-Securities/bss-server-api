@@ -39,4 +39,25 @@ public class CommentService {
 
         return GetCommentResDto.toDto(commentJpaRepository.save(comment));
     }
+
+    @Transactional
+    public GetCommentResDto createReplyComment(final String userName, final Long researchId, final Long commentId, final CreateCommentReqDto createCommentReqDto) {
+
+        User user = userJpaRepository.findByUserName(userName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        Research research = researchJpaRepository.findById(researchId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.RESEARCH_NOT_FOUND));
+        Comment parentComment = commentJpaRepository.findById(commentId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
+
+        Comment comment = Comment.builder()
+                .content(createCommentReqDto.getContent())
+                .user(user)
+                .research(research)
+                .build();
+
+        comment.setParentComment(parentComment);
+
+        return GetCommentResDto.toDto(commentJpaRepository.save(comment));
+    }
 }
