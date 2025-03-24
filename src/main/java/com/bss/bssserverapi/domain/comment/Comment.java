@@ -29,6 +29,8 @@ public class Comment extends DateTimeField {
 
     private Long childCommentCount = 0L;
 
+    private Long recommendCount = 0L;
+
     @NotNull
     private Boolean isDeleted = Boolean.FALSE;
 
@@ -80,5 +82,15 @@ public class Comment extends DateTimeField {
         this.deletedAt = LocalDateTime.now();
 
         this.research.minusComment();
+    }
+
+    public void addRecommend(){
+
+        this.recommendCount++;
+    }
+
+    public void minusRecommend(){
+
+        this.recommendCount--;
     }
 }

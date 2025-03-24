@@ -66,6 +66,18 @@ public class CommentController {
                 .body(commentService.updateComment(userName, commentId, updateCommentReqDto));
     }
 
+    @PatchMapping("/comments/{commentId}/recommend")
+    public ResponseEntity<?> updateCommentRecommend(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("commentId") final Long commentId) {
+
+        commentService.updateCommentRecommend(userName, commentId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @AuthenticationPrincipal final String userName,
