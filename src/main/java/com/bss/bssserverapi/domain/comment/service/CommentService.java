@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
+import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
@@ -70,12 +71,35 @@ public class CommentService {
 
         return GetCommentListResDto.builder()
                 .getCommentResDtoList(commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId)
-                        .stream().map(comment -> {
-                            GetCommentResDto getCommentResDto = GetCommentResDto.toDto(comment);
-                            getCommentResDto.setGetReplyCommentResDtoList(comment.getChildCommentList().stream().map(GetCommentResDto::toDto).toList());
-                            return getCommentResDto;
-                        })
+                        .stream().map(GetCommentResDto::toDto)
                         .toList())
                 .build();
+    }
+
+    @Transactional
+    public GetCommentResDto updateComment(final String userName, final Long commentId, final UpdateCommentReqDto updateCommentReqDto){
+
+        User user = userJpaRepository.findByUserName(userName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        Comment comment = commentJpaRepository.findById(commentId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
+
+        this.authorizeUser(user, comment);
+
+        comment.update(updateCommentReqDto.getContent());
+
+        return GetCommentResDto.toDto(commentJpaRepository.save(comment));
+    }
+
+    private void authorizeUser(final User user, final Comment comment) {
+
+        String requestUser = user.getUserName();
+        String researchUser = comment.getResearch().getUser().getUserName();
+        String commentUser = comment.getUser().getUserName();
+
+        if(requestUser.equals(commentUser) || requestUser.equals(researchUser))
+            return;
+
+        throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
     }
 }

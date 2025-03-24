@@ -3,6 +3,7 @@ package com.bss.bssserverapi.domain.comment.controller;
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
+import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,5 +53,16 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(commentService.getCommentListByResearch(researchId));
+    }
+
+    @PatchMapping("/comments/{commentId}")
+    public ResponseEntity<GetCommentResDto> updateComment(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("commentId") final Long commentId,
+            @RequestBody final UpdateCommentReqDto updateCommentReqDto) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(commentService.updateComment(userName, commentId, updateCommentReqDto));
     }
 }
