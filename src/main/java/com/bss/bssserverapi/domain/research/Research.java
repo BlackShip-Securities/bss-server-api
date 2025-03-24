@@ -30,6 +30,8 @@ public class Research extends DateTimeField {
 
     private Long recommendCount = 0L;
 
+    private Long commentCount = 0L;
+
     @Column(nullable = false)
     private Long targetPrice;
 
@@ -93,5 +95,10 @@ public class Research extends DateTimeField {
     public void minusRecommend(){
 
         this.recommendCount--;
+    }
+
+    public void addComment() {
+
+        this.commentCount++;
     }
 }

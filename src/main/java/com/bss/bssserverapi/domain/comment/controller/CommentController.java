@@ -1,0 +1,56 @@
+package com.bss.bssserverapi.domain.comment.controller;
+
+import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
+import com.bss.bssserverapi.domain.comment.service.CommentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/v1")
+public class CommentController {
+
+    private final CommentService commentService;
+
+    /**
+     * 댓글 작성
+     * */
+    @PostMapping("/researches/{researchId}/comments")
+    public ResponseEntity<GetCommentResDto> createComment(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("researchId") final Long researchId,
+            @RequestBody final CreateCommentReqDto createCommentReqDto) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(commentService.createComment(userName, researchId, createCommentReqDto));
+    }
+
+    /**
+     * 답글(대댓글) 작성
+     * */
+    @PostMapping("/researches/{researchId}/comments/{commentId}/replyComments")
+    public ResponseEntity<GetCommentResDto> createReplyComment(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("researchId") final Long researchId,
+            @PathVariable("commentId") final Long commentId,
+            @RequestBody final CreateCommentReqDto createCommentReqDto) {
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(commentService.createReplyComment(userName, researchId, commentId, createCommentReqDto));
+    }
+
+    @GetMapping("/researches/{researchId}/comments")
+    public ResponseEntity<GetCommentListResDto> getCommentListByResearch(@PathVariable("researchId") final Long researchId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(commentService.getCommentListByResearch(researchId));
+    }
+}

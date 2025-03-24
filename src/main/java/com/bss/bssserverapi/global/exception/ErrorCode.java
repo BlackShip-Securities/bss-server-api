@@ -24,6 +24,8 @@ public enum ErrorCode {
     RESEARCH_TAG_LIMIT_EXCEEDED("B004", "A research can have up to 5 unique tags"),
     RESEARCH_TAG_DUPLICATED("B005", "Tags must be unique"),
     RESEARCH_NOT_FOUND("B006", "Research not found"),
+    COMMENT_NOT_FOUND("B007", "Comment not found"),
+
 
 
     // common
