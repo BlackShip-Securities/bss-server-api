@@ -94,10 +94,9 @@ public class CommentService {
     private void authorizeUser(final User user, final Comment comment) {
 
         String requestUser = user.getUserName();
-        String researchUser = comment.getResearch().getUser().getUserName();
         String commentUser = comment.getUser().getUserName();
 
-        if(requestUser.equals(commentUser) || requestUser.equals(researchUser))
+        if(requestUser.equals(commentUser))
             return;
 
         throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
