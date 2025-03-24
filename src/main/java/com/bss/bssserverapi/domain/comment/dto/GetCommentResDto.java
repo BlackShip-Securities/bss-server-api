@@ -14,16 +14,20 @@ public class GetCommentResDto {
     private String content;
     private String userName;
     private Long childCommentCount;
+    private Boolean isDeleted;
+    private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<GetCommentResDto> getReplyCommentResDtoList = new ArrayList<>();
 
-    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final LocalDateTime createdAt, final LocalDateTime updatedAt, final List<GetCommentResDto> getReplyCommentResDtoList) {
+    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final Boolean isDeleted, final LocalDateTime deletedAt, final LocalDateTime createdAt, final LocalDateTime updatedAt, final List<GetCommentResDto> getReplyCommentResDtoList) {
 
         this.id = id;
         this.content = content;
         this.userName = userName;
         this.childCommentCount = childCommentCount;
+        this.isDeleted = isDeleted;
+        this.deletedAt = deletedAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.getReplyCommentResDtoList = getReplyCommentResDtoList;
@@ -37,9 +41,11 @@ public class GetCommentResDto {
 
         return new GetCommentResDto(
                 comment.getId(),
-                comment.getContent(),
+                (comment.getIsDeleted().equals(Boolean.TRUE) ? "삭제된 댓글입니다. " : comment.getContent()),
                 comment.getUser().getUserName(),
                 comment.getChildCommentCount(),
+                comment.getIsDeleted(),
+                comment.getDeletedAt(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),
                 getCommentResDtoList
@@ -49,5 +55,10 @@ public class GetCommentResDto {
     public void setGetReplyCommentResDtoList(final List<GetCommentResDto> getReplyCommentResDtoList){
 
         this.getReplyCommentResDtoList = getReplyCommentResDtoList;
+    }
+
+    public void setContent(final String content) {
+
+        this.content = content;
     }
 }
