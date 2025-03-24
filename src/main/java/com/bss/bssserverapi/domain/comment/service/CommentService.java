@@ -1,11 +1,13 @@
 package com.bss.bssserverapi.domain.comment.service;
 
 import com.bss.bssserverapi.domain.comment.Comment;
+import com.bss.bssserverapi.domain.comment.CommentRecommend;
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
 import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
+import com.bss.bssserverapi.domain.comment.repository.CommentRecommendJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
 import com.bss.bssserverapi.domain.user.User;
@@ -24,6 +26,7 @@ public class CommentService {
     private final CommentJpaRepository commentJpaRepository;
     private final ResearchJpaRepository researchJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final CommentRecommendJpaRepository commentRecommendJpaRepository;
 
     @Transactional
     public GetCommentResDto createComment(final String userName, final Long researchId, final CreateCommentReqDto createCommentReqDto) {
@@ -100,6 +103,29 @@ public class CommentService {
             return;
 
         throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public void updateCommentRecommend(final String userName, final Long commentId) {
+
+        final User user = userJpaRepository.findByUserName(userName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        final Comment comment = commentJpaRepository.findById(commentId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
+
+        CommentRecommend commentRecommend = this.getOrCreateCommentRecommend(user, comment);
+
+        commentRecommend.updateRecommend();
+    }
+
+    private CommentRecommend getOrCreateCommentRecommend(final User user, final Comment comment ) {
+
+        return commentRecommendJpaRepository.findByUserIdAndCommentId(user.getId(), comment.getId())
+                .orElseGet(() -> commentRecommendJpaRepository.save(CommentRecommend.builder()
+                        .recommend(Boolean.FALSE)
+                        .user(user)
+                        .comment(comment)
+                        .build()));
     }
 
     @Transactional

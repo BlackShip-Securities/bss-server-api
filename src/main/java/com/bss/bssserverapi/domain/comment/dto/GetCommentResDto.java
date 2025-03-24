@@ -14,18 +14,20 @@ public class GetCommentResDto {
     private String content;
     private String userName;
     private Long childCommentCount;
+    private Long recommendCount;
     private Boolean isDeleted;
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<GetCommentResDto> getReplyCommentResDtoList = new ArrayList<>();
 
-    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final Boolean isDeleted, final LocalDateTime deletedAt, final LocalDateTime createdAt, final LocalDateTime updatedAt, final List<GetCommentResDto> getReplyCommentResDtoList) {
+    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final Long recommendCount, final Boolean isDeleted, final LocalDateTime deletedAt, final LocalDateTime createdAt, final LocalDateTime updatedAt, final List<GetCommentResDto> getReplyCommentResDtoList) {
 
         this.id = id;
         this.content = content;
         this.userName = userName;
         this.childCommentCount = childCommentCount;
+        this.recommendCount = recommendCount;
         this.isDeleted = isDeleted;
         this.deletedAt = deletedAt;
         this.createdAt = createdAt;
@@ -44,6 +46,7 @@ public class GetCommentResDto {
                 (comment.getIsDeleted().equals(Boolean.TRUE) ? "삭제된 댓글입니다. " : comment.getContent()),
                 comment.getUser().getUserName(),
                 comment.getChildCommentCount(),
+                comment.getRecommendCount(),
                 comment.getIsDeleted(),
                 comment.getDeletedAt(),
                 comment.getCreatedAt(),
