@@ -2,6 +2,7 @@ package com.bss.bssserverapi.domain.comment.service;
 
 import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
@@ -62,5 +63,15 @@ public class CommentService {
         research.addComment();
 
         return GetCommentResDto.toDto(commentJpaRepository.save(comment));
+    }
+
+    @Transactional(readOnly = true)
+    public GetCommentListResDto getCommentListByResearch(final Long researchId){
+
+        return GetCommentListResDto.builder()
+                .getCommentResDtoList(commentJpaRepository.findCommentsByResearchId(researchId)
+                        .stream().map(GetCommentResDto::toDto)
+                        .toList())
+                .build();
     }
 }

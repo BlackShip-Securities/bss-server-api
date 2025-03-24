@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.domain.comment.controller;
 
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
 import com.bss.bssserverapi.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,13 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(commentService.createReplyComment(userName, researchId, commentId, createCommentReqDto));
+    }
+
+    @GetMapping("/researches/{researchId}/comments")
+    public ResponseEntity<GetCommentListResDto> getCommentListByResearch(@PathVariable("researchId") final Long researchId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(commentService.getCommentListByResearch(researchId));
     }
 }
