@@ -101,4 +101,9 @@ public class Research extends DateTimeField {
 
         this.commentCount++;
     }
+
+    public void minusComment() {
+
+        this.commentCount--;
+    }
 }

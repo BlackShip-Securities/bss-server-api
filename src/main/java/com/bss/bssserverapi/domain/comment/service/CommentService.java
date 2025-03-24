@@ -84,19 +84,44 @@ public class CommentService {
         Comment comment = commentJpaRepository.findById(commentId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
 
-        this.authorizeUser(user, comment);
+        this.authorizeUserByComment(user, comment);
 
         comment.update(updateCommentReqDto.getContent());
 
         return GetCommentResDto.toDto(commentJpaRepository.save(comment));
     }
 
-    private void authorizeUser(final User user, final Comment comment) {
+    private void authorizeUserByComment(final User user, final Comment comment) {
 
         String requestUser = user.getUserName();
         String commentUser = comment.getUser().getUserName();
 
         if(requestUser.equals(commentUser))
+            return;
+
+        throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
+    }
+
+    @Transactional
+    public void deleteComment(final String userName, final Long commentId){
+
+        User user = userJpaRepository.findByUserName(userName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+        Comment comment = commentJpaRepository.findById(commentId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
+
+        this.authorizeUserByCommentAndResearch(user, comment);
+
+        comment.softDelete();
+    }
+
+    private void authorizeUserByCommentAndResearch(final User user, final Comment comment) {
+
+        String requestUser = user.getUserName();
+        String commentUser = comment.getUser().getUserName();
+        String researchUser = comment.getResearch().getUser().getUserName();
+
+        if(requestUser.equals(commentUser) || requestUser.equals(researchUser))
             return;
 
         throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);

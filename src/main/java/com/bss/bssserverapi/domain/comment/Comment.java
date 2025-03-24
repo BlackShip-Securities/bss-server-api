@@ -4,16 +4,19 @@ import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends DateTimeField {
 
@@ -25,6 +28,11 @@ public class Comment extends DateTimeField {
     private String content;
 
     private Long childCommentCount = 0L;
+
+    @NotNull
+    private Boolean isDeleted = Boolean.FALSE;
+
+    private LocalDateTime deletedAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -64,5 +72,13 @@ public class Comment extends DateTimeField {
     public void update(String content) {
 
         this.content = content;
+    }
+
+    public void softDelete() {
+
+        this.isDeleted = Boolean.TRUE;
+        this.deletedAt = LocalDateTime.now();
+
+        this.research.minusComment();
     }
 }

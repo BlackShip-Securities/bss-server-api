@@ -65,4 +65,16 @@ public class CommentController {
                 .status(HttpStatus.OK)
                 .body(commentService.updateComment(userName, commentId, updateCommentReqDto));
     }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(
+            @AuthenticationPrincipal final String userName,
+            @PathVariable("commentId") final Long commentId){
+
+        commentService.deleteComment(userName, commentId);
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }
