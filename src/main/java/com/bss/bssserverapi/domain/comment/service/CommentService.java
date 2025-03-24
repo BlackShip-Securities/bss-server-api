@@ -69,8 +69,12 @@ public class CommentService {
     public GetCommentListResDto getCommentListByResearch(final Long researchId){
 
         return GetCommentListResDto.builder()
-                .getCommentResDtoList(commentJpaRepository.findCommentsByResearchId(researchId)
-                        .stream().map(GetCommentResDto::toDto)
+                .getCommentResDtoList(commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId)
+                        .stream().map(comment -> {
+                            GetCommentResDto getCommentResDto = GetCommentResDto.toDto(comment);
+                            getCommentResDto.setGetReplyCommentResDtoList(comment.getChildCommentList().stream().map(GetCommentResDto::toDto).toList());
+                            return getCommentResDto;
+                        })
                         .toList())
                 .build();
     }
