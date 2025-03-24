@@ -41,7 +41,7 @@ public class GetCommentResDto {
 
         return new GetCommentResDto(
                 comment.getId(),
-                comment.getContent(),
+                (comment.getIsDeleted().equals(Boolean.TRUE) ? "삭제된 댓글입니다. " : comment.getContent()),
                 comment.getUser().getUserName(),
                 comment.getChildCommentCount(),
                 comment.getIsDeleted(),
@@ -55,5 +55,10 @@ public class GetCommentResDto {
     public void setGetReplyCommentResDtoList(final List<GetCommentResDto> getReplyCommentResDtoList){
 
         this.getReplyCommentResDtoList = getReplyCommentResDtoList;
+    }
+
+    public void setContent(final String content) {
+
+        this.content = content;
     }
 }
