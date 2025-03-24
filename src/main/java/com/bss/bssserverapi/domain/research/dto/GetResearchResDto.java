@@ -2,8 +2,10 @@ package com.bss.bssserverapi.domain.research.dto;
 
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.tag.Tag;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +19,7 @@ public class GetResearchResDto {
     private final String title;
     private final String content;
     private final Long recommendCount;
+    private final Long commentCount;
     private final Long targetPrice;
     private final LocalDate dateStart;
     private final LocalDate dateEnd;
@@ -32,6 +35,7 @@ public class GetResearchResDto {
                 research.getTitle(),
                 research.getContent(),
                 research.getRecommendCount(),
+                research.getCommentCount(),
                 research.getTargetPrice(),
                 research.getDateStart(),
                 research.getDateEnd(),

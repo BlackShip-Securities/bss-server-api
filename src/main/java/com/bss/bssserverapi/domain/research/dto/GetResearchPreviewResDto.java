@@ -15,6 +15,7 @@ public class GetResearchPreviewResDto {
     private final Long id;
     private final String title;
     private final Long recommendCount;
+    private final Long commentCount;
     private final Long targetPrice;
     private final LocalDate dateStart;
     private final LocalDate dateEnd;
@@ -27,6 +28,7 @@ public class GetResearchPreviewResDto {
                 research.getId(),
                 research.getTitle(),
                 research.getRecommendCount(),
+                research.getCommentCount(),
                 research.getTargetPrice(),
                 research.getDateStart(),
                 research.getDateEnd(),
