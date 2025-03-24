@@ -60,4 +60,9 @@ public class Comment extends DateTimeField {
         this.childCommentList.add(childComment);
         this.childCommentCount++;
     }
+
+    public void update(String content) {
+
+        this.content = content;
+    }
 }
