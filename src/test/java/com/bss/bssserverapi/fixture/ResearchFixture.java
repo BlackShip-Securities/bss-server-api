@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.fixture;
 
 import com.bss.bssserverapi.domain.research.Research;
+import com.bss.bssserverapi.domain.research.ResearchTag;
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
 
 import java.time.LocalDate;
