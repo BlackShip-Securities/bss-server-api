@@ -1,5 +1,6 @@
-package com.bss.bssserverapi.domain.user;
+package com.bss.bssserverapi.user;
 
+import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
 import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
 import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -43,7 +45,7 @@ public class UserServiceTest {
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
-        doReturn(User.builder()
+        Mockito.doReturn(User.builder()
                 .userName("bss_admin")
                 .password(bCryptPasswordEncoder.encode("Qq12341234@"))
                 .build())

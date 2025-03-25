@@ -6,6 +6,7 @@ import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -52,6 +53,7 @@ public class Research extends DateTimeField {
     @OneToMany(mappedBy = "research", cascade = CascadeType.PERSIST)
     private List<ResearchTag> researchTagList = new ArrayList<>();
 
+    @Builder
     public Research(String title, String content, Long targetPrice, LocalDate dateStart, LocalDate dateEnd) {
 
         this.title = title;

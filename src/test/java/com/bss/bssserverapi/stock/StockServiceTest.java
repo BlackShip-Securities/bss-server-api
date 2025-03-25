@@ -1,5 +1,6 @@
-package com.bss.bssserverapi.domain.stock;
+package com.bss.bssserverapi.stock;
 
+import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.stock.dto.GetStockResDto;
 import com.bss.bssserverapi.domain.stock.repository.StockRepository;
 import com.bss.bssserverapi.domain.stock.service.StockService;
