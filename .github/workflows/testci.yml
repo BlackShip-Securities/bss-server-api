@@ -57,7 +57,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 70
 #          min-coverage-changed-files: 80
-          skip-if-no-changes: false
+          skip-if-no-changes: true
+          update-comment: false
           debug-mode: true
 
       - name: If Failed, Comment on Code Lines for Failed Tests
