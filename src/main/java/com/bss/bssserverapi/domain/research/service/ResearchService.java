@@ -124,7 +124,10 @@ public class ResearchService {
     @Transactional(readOnly = true)
     public GetResearchPagingResDto getResearchPagingByStock(final Long stockId, final Pageable pageable) {
 
-        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stockId, pageable)
+        Stock stock = stockRepository.findStockById(stockId)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.STOCK_NOT_FOUND));
+
+        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stock.getId(), pageable)
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()

@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.auth;
+package com.bss.bssserverapi.auth;
 
 import com.bss.bssserverapi.domain.auth.dto.LoginUserReqDto;
 import com.bss.bssserverapi.domain.auth.dto.LoginUserResWithCookieDto;
