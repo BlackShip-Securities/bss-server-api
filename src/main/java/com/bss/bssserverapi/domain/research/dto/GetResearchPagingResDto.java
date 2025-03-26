@@ -9,12 +9,12 @@ import java.util.List;
 public class GetResearchPagingResDto {
 
     private List<GetResearchPreviewResDto> getResearchPreviewResDtoList;
-    private final boolean hasNext;
+    private final Boolean hasNext;
 
     @Builder
-    public GetResearchPagingResDto(final boolean hasNext, final List<GetResearchPreviewResDto> getResearchPreviewResDtoList) {
+    public GetResearchPagingResDto(final List<GetResearchPreviewResDto> getResearchPreviewResDtoList, final Boolean hasNext) {
 
-        this.hasNext = hasNext;
         this.getResearchPreviewResDtoList = getResearchPreviewResDtoList;
+        this.hasNext = hasNext;
     }
 }

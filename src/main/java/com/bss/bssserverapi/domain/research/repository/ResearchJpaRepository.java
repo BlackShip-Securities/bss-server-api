@@ -4,9 +4,21 @@ import com.bss.bssserverapi.domain.research.Research;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface ResearchJpaRepository extends JpaRepository<Research, Long> {
 
     Slice<Research> findAllByUserId(Long userId, Pageable pageable);
-    Slice<Research> findAllByStockId(Long stockId, Pageable pageable);
+
+    @Query("SELECT r FROM Research r WHERE r.stock.id = :stockId ORDER BY r.id DESC LIMIT :limit")
+    List<Research> findFirstPageByStockId(@Param("stockId") final Long stockId,
+                                          @Param("limit") final Long limit);
+
+    @Query("SELECT r FROM Research r WHERE r.stock.id = :stockId AND r.id < :lastResearchId ORDER BY r.id DESC LIMIT :limit")
+    List<Research> findNextPageByStockId(@Param("stockId") final Long stockId,
+                                         @Param("limit") final Long limit,
+                                         @Param("lastResearchId") final Long lastResearchId);
 }
