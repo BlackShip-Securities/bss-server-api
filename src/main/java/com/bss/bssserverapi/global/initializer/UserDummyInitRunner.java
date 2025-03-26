@@ -39,14 +39,9 @@ public class UserDummyInitRunner implements ApplicationRunner {
 
         List<User> userList = new ArrayList<>();
 
-        userList.add(User.builder()
-                .userName(USER_NAME)
-                .password(bCryptPasswordEncoder.encode(PASSWORD))
-                .build());
-
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             User user = User.builder()
-                    .userName(USER_NAME + i)
+                    .userName(USER_NAME + "_" + i)
                     .password(bCryptPasswordEncoder.encode(PASSWORD))
                     .build();
 
