@@ -29,18 +29,6 @@ test {
     useJUnitPlatform()
 }
 
-jacoco {
-    toolVersion = "0.8.12"
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        html.required.set(true)
-        xml.required.set(true)
-    }
-}
-
 dependencies {
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -79,4 +67,31 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+    }
+    excludedClassFilesForReport(classDirectories)
+    dependsOn test
+}
+
+private excludedClassFilesForReport(classDirectories) {
+    classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "com/bss/bssserverapi/global/**/*",
+                        "com/bss/bssserverapi/domain/auth/filter/**",
+                        "com/bss/bssserverapi/**/dto/**",
+                        "**/*Application*",
+                ])
+            })
+    )
 }
