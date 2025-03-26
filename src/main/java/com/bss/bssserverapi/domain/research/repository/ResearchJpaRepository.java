@@ -11,7 +11,14 @@ import java.util.List;
 
 public interface ResearchJpaRepository extends JpaRepository<Research, Long> {
 
-    Slice<Research> findAllByUserId(Long userId, Pageable pageable);
+    @Query("SELECT r FROM Research r WHERE r.user.userName = :userName ORDER BY r.id DESC LIMIT :limit")
+    List<Research> findFirstPageByUserName(@Param("userName") final String userName,
+                                          @Param("limit") final Long limit);
+
+    @Query("SELECT r FROM Research r WHERE r.user.userName = :userName AND r.id < :lastResearchId ORDER BY r.id DESC LIMIT :limit")
+    List<Research> findNextPageByUserName(@Param("userName") final String userName,
+                                         @Param("limit") final Long limit,
+                                         @Param("lastResearchId") final Long lastResearchId);
 
     @Query("SELECT r FROM Research r WHERE r.stock.id = :stockId ORDER BY r.id DESC LIMIT :limit")
     List<Research> findFirstPageByStockId(@Param("stockId") final Long stockId,
