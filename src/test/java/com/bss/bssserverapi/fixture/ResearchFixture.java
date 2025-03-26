@@ -1,10 +1,10 @@
 package com.bss.bssserverapi.fixture;
 
 import com.bss.bssserverapi.domain.research.Research;
-import com.bss.bssserverapi.domain.research.ResearchTag;
 import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ResearchFixture {
@@ -103,5 +103,21 @@ public class ResearchFixture {
                 .stockId(1L)
                 .tagNameList(List.of("Tag_0", "Tag_1", "Tag_2", "Tag_3", "Tag_4", "Tag_5"))
                 .build();
+    }
+
+    public static final List<Research> 리서치_페이징_조회(final Long batchSize) {
+
+        List<Research> researchList = new ArrayList<>();
+        for (int i = 0; i < batchSize; i++) {
+            researchList.add(Research.builder()
+                    .title("Title" + "_" + i)
+                    .content("Content" + "_" + i)
+                    .targetPrice(1000L)
+                    .dateStart(LocalDate.of(2030, 1, 1))
+                    .dateEnd(LocalDate.of(2030, 3, 31))
+                    .build());
+        }
+
+        return researchList;
     }
 }
