@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class LoginUserReqDto {
 
     @NotNull
-    @Schema(example = "bss_test")
+    @Schema(example = "bss_test_0")
     private String userName;
 
     @NotNull

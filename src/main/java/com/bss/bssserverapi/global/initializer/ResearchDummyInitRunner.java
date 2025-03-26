@@ -1,8 +1,5 @@
 package com.bss.bssserverapi.global.initializer;
 
-import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
-import com.bss.bssserverapi.domain.research.repository.ResearchJpaRepository;
-import com.bss.bssserverapi.domain.research.service.ResearchService;
 import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.stock.repository.StockJpaRepository;
 import com.bss.bssserverapi.domain.user.User;
@@ -12,79 +9,113 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@LocalDummyInit
+@Component
 @Order(2)
 public class ResearchDummyInitRunner implements ApplicationRunner {
 
+    private final JdbcTemplate jdbcTemplate;
     private final UserJpaRepository userJpaRepository;
     private final StockJpaRepository stockJpaRepository;
-    private final ResearchJpaRepository researchJpaRepository;
-    private final ResearchService researchService;
+
+    private static final int BATCH_SIZE = 5000;
+    private static final int RESEARCH_PER_STOCK = 100000;
+    private static final int TAGS_PER_RESEARCH = 5;
+
+    private long tagSequence = 1L;
+    private long researchSequence = 1L; // 직접 태그 ID 시퀀스를 관리
+
 
     @Override
-    public void run(final ApplicationArguments args) {
+    public void run(ApplicationArguments args) {
 
-        if (researchJpaRepository.count() > 0) {
-            log.info("Research Dummy data exists");
+        Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM research", Long.class);
+        if (count != null && count > 0) {
+            log.info("🔍 Research dummy already exists.");
             return;
         }
 
-        this.createResearchDummy();
+        insertDummyData();
+
+        log.info("🎉 {}개 더미 Research 데이터 삽입 완료!", researchSequence - 1);
     }
 
-    private void createResearchDummy() {
+    private void insertDummyData() {
 
-        List<User> userList = userJpaRepository.findAll();
-        List<Stock> stockList = stockJpaRepository.findAll();
+        List<User> users = userJpaRepository.findAll();
+        List<Stock> stocks = stockJpaRepository.findAll();
 
-        for (User user : userList) {
-            List<CreateResearchReqDto> researchList = createResearchReqDtoListByStockList(user.getUserName(), stockList);
-            researchList.forEach(research -> researchService.createResearch(user.getUserName(), research));
-            log.info(user.getUserName() + " research dummy saved.");
-        }
-        log.info("research dummy saved.");
-    }
+        String insertResearchSql = """
+            INSERT INTO research (title, content, target_price, date_start, date_end, user_id, stock_id, recommend_count, comment_count, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, NOW(), NOW())
+        """;
+        String insertTagSql = """
+            INSERT INTO tag (id, name, created_at)
+            VALUES (?, ?, NOW())
+        """;
+        String insertResearchTagSql = """
+            INSERT INTO research_tag (research_id, tag_id) 
+            VALUES (?, ?)
+        """;
 
-    private List<CreateResearchReqDto> createResearchReqDtoListByStockList(final String userName, final List<Stock> stockList) {
+        // 100
+        for (User user : users) {
+            List<Object[]> researchBatch = new ArrayList<>();
+            List<Object[]> tagBatch = new ArrayList<>();
+            List<Object[]> researchTagBatch = new ArrayList<>();
 
-        List<CreateResearchReqDto> researchList = new ArrayList<>();
-        for(Stock stock : stockList) {
-            for (int i = 0; i < 5; i++) {
-                CreateResearchReqDto research = new CreateResearchReqDto(
-                        generateResearchName(userName, stock.getName(), i),
-                        "This is the content for research.",
-                        10000L,
-                        LocalDate.now().plusDays(1),
-                        LocalDate.now().plusDays(10),
-                        stock.getId(),
-                        generateTagNameList(stock.getName(), userName, i)
-                );
+            // 200 = 2 * 100
+            for (int k = 0; k < 2; k ++) {
+                Stock stock = stocks.get(k);
 
-                researchList.add(research);
+                // 20,000,000 = 100,000 * 2 * 100
+                for (int i = 0; i < RESEARCH_PER_STOCK; i++) {
+                    String title = "RESEARCH_" + user.getUserName() + "_" + stock.getName() + "_" + i;
+                    Long researchId = researchSequence++;
+
+                    // Research insert row
+                    researchBatch.add(new Object[]{
+                            title,
+                            "This is the content for research.",
+                            10000L,
+                            Date.valueOf(LocalDate.now().plusDays(1)),
+                            Date.valueOf(LocalDate.now().plusDays(10)),
+                            user.getId(),
+                            stock.getId()
+                    });
+
+                    // Tags per research
+                    for (int j = 0; j < TAGS_PER_RESEARCH; j++) {
+                        String tagName = "TAG_" + user.getUserName() + "_" + stock.getName() + "_" + i + "_" + j;
+                        Long tagId = tagSequence++;
+                        tagBatch.add(new Object[]{tagId, tagName});
+
+                        // research_tag row
+                        researchTagBatch.add(new Object[]{researchId, tagId});
+                    }
+
+                    if (researchBatch.size() % BATCH_SIZE == 0) {
+                        jdbcTemplate.batchUpdate(insertResearchSql, researchBatch);
+                        jdbcTemplate.batchUpdate(insertTagSql, tagBatch);
+                        jdbcTemplate.batchUpdate(insertResearchTagSql, researchTagBatch);
+
+                        log.info("🔨 Research Id: {}, Batch: {}, User: {}", researchId, researchBatch.size(), user.getUserName());
+
+                        researchBatch.clear();
+                        tagBatch.clear();
+                        researchTagBatch.clear();
+                    }
+                }
             }
         }
-
-        return researchList;
-    }
-
-    private String generateResearchName(final String userName, final String stockName, final Integer i) {
-
-        return "RESEARCH" + userName + "_" + stockName + "_" + i;
-    }
-
-    private List<String> generateTagNameList(final String userName, final String stockName, final Integer i) {
-
-        List<String> tagNameList = new ArrayList<>();
-        for(int j = 0; j < 5; j++) {
-            tagNameList.add("TAG" + userName + "_" + stockName + "_" + i + "_" + j);
-        }
-        return tagNameList;
     }
 }
