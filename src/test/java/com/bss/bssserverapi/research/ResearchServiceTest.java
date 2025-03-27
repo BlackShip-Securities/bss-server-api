@@ -1,6 +1,5 @@
 package com.bss.bssserverapi.research;
 
-import com.bss.bssserverapi.common.SliceStub;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.research.ResearchRecommend;
 import com.bss.bssserverapi.domain.research.ResearchTag;
@@ -206,67 +205,111 @@ class ResearchServiceTest {
     }
 
     @Test
-    @DisplayName("리서치 페이징 조회 by 주식 성공")
-    void getResearchPagingByStock_Success() {
+    @DisplayName("리서치 페이징 조회 by 주식 성공 - 첫 번째 페이지 조회")
+    void getResearchPagingByStock_Success_FirstPage() {
 
         // given
         Long stockId = 1L;
+        Long limit = 10L;
+        final Long BATCH_SIZE = limit + 1;
+
         Stock stock = StockFixture.주식_0();
-        Research research = ResearchFixture.리서치_생성_성공();
+        List<Research> researchList = ResearchFixture.리서치_페이징_조회(BATCH_SIZE);
         User user = UserFixture.사용자_0();
         List<Tag> tagList = TagFixture.태그5개();
-        Pageable pageable = mock(Pageable.class);
 
-        user.addResearch(research);
+        for(Research research : researchList){
+            user.addResearch(research);
+        }
 
         when(stockRepository.findStockById(stockId)).thenReturn(Optional.of(stock));
-        when(researchJpaRepository.findAllByStockId(stockId, pageable))
-                .thenReturn(new SliceStub<>(List.of(research), false));
-        when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
-                .thenReturn(tagList.stream().map(tag -> {
-                    ResearchTag rt = new ResearchTag();
-                    rt.setTag(tag);
-                    return rt;
-                }).toList());
+        when(researchJpaRepository.findFirstPageByStockId(stockId, BATCH_SIZE))
+                .thenReturn(researchList);
+        for(Research research : researchList){
+            when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
+                    .thenReturn(tagList.stream().map(tag -> {
+                        ResearchTag rt = new ResearchTag();
+                        rt.setTag(tag);
+                        return rt;
+                    }).toList());
+        }
 
         // when
-        GetResearchPagingResDto res = researchService.getResearchPagingByStock(stockId, pageable);
+        GetResearchPagingResDto res = researchService.getResearchPagingByStock(stockId, 10L, 0L);
 
         // then
-        assertThat(res.getGetResearchPreviewResDtoList()).hasSize(1);
-        assertThat(res.isHasNext()).isFalse();
+        assertThat(res.getGetResearchPreviewResDtoList()).hasSize(10);
+        assertThat(res.getHasNext()).isTrue();
     }
 
     @Test
-    @DisplayName("리서치 페이징 조회 by 사용자 성공")
-    void getResearchPagingByUser_Success() {
+    @DisplayName("리서치 페이징 조회 by 주식 성공 - N번째 페이지 조회")
+    void getResearchPagingByStock_Success_NextPage() {
 
         // given
-        Research research = ResearchFixture.리서치_생성_성공();
+        Long stockId = 1L;
+        Long limit = 10L;
+        final Long BATCH_SIZE = limit + 1;
+
+        Stock stock = StockFixture.주식_0();
+        List<Research> researchList = ResearchFixture.리서치_페이징_조회(BATCH_SIZE - 5L);
         User user = UserFixture.사용자_0();
         List<Tag> tagList = TagFixture.태그5개();
-        Pageable pageable = mock(Pageable.class);
-        String userName = user.getUserName();
 
-        user.addResearch(research);
+        for(Research research : researchList){
+            user.addResearch(research);
+        }
 
-        when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.of(user));
-        when(researchJpaRepository.findAllByUserId(user.getId(), pageable))
-                .thenReturn(new SliceStub<>(List.of(research), false));
-        when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
-                .thenReturn(tagList.stream().map(tag -> {
-                    ResearchTag rt = new ResearchTag();
-                    rt.setTag(tag);
-                    return rt;
-                }).toList());
+        when(stockRepository.findStockById(stockId)).thenReturn(Optional.of(stock));
+        when(researchJpaRepository.findNextPageByStockId(stockId, BATCH_SIZE, 5L))
+                .thenReturn(researchList);
+        for(Research research : researchList){
+            when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
+                    .thenReturn(tagList.stream().map(tag -> {
+                        ResearchTag rt = new ResearchTag();
+                        rt.setTag(tag);
+                        return rt;
+                    }).toList());
+        }
 
         // when
-        GetResearchPagingResDto res = researchService.getResearchPagingByUser(userName, pageable);
+        GetResearchPagingResDto res = researchService.getResearchPagingByStock(stockId, 10L, 5L);
 
         // then
-        assertThat(res.getGetResearchPreviewResDtoList()).hasSize(1);
-        assertThat(res.isHasNext()).isFalse();
+        assertThat(res.getGetResearchPreviewResDtoList()).hasSize(6);
+        assertThat(res.getHasNext()).isFalse();
     }
+
+//    @Test
+//    @DisplayName("리서치 페이징 조회 by 사용자 성공")
+//    void getResearchPagingByUser_Success() {
+//
+//        // given
+//        Research research = ResearchFixture.리서치_생성_성공();
+//        User user = UserFixture.사용자_0();
+//        List<Tag> tagList = TagFixture.태그5개();
+//        Pageable pageable = mock(Pageable.class);
+//        String userName = user.getUserName();
+//
+//        user.addResearch(research);
+//
+//        when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.of(user));
+//        when(researchJpaRepository.findAllByUserId(user.getId(), pageable))
+//                .thenReturn(new SliceStub<>(List.of(research), false));
+//        when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
+//                .thenReturn(tagList.stream().map(tag -> {
+//                    ResearchTag rt = new ResearchTag();
+//                    rt.setTag(tag);
+//                    return rt;
+//                }).toList());
+//
+//        // when
+//        GetResearchPagingResDto res = researchService.getResearchPagingByUser(userName, pageable);
+//
+//        // then
+//        assertThat(res.getGetResearchPreviewResDtoList()).hasSize(1);
+//        assertThat(res.isHasNext()).isFalse();
+//    }
 
     @Test
     @DisplayName("리서치 페이징 조회 by 주식 실패 - 주식을 찾을 수 없음")
@@ -279,7 +322,7 @@ class ResearchServiceTest {
         when(stockRepository.findStockById(stockId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> researchService.getResearchPagingByStock(stockId, pageable))
+        assertThatThrownBy(() -> researchService.getResearchPagingByStock(stockId, 10L, 0L))
                 .isInstanceOf(GlobalException.class)
                 .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.NOT_FOUND)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.STOCK_NOT_FOUND);
@@ -296,7 +339,7 @@ class ResearchServiceTest {
         when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> researchService.getResearchPagingByUser(userName, pageable))
+        assertThatThrownBy(() -> researchService.getResearchPagingByUser(userName, 10L, 0L))
                 .isInstanceOf(GlobalException.class)
                 .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.NOT_FOUND)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);

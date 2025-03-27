@@ -122,44 +122,66 @@ public class ResearchService {
     }
 
     @Transactional(readOnly = true)
-    public GetResearchPagingResDto getResearchPagingByStock(final Long stockId, final Pageable pageable) {
+    public GetResearchPagingResDto getResearchPagingByStock(final Long stockId, final Long limit, final Long lastResearchId) {
 
-        Stock stock = stockRepository.findStockById(stockId)
+        final Stock stock = stockRepository.findStockById(stockId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.STOCK_NOT_FOUND));
 
-        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByStockId(stock.getId(), pageable)
+        final Long fetchSize = limit + 1;
+
+        final List<Research> researchList = (lastResearchId == 0L)
+                ? researchJpaRepository.findFirstPageByStockId(stock.getId(), fetchSize)
+                : researchJpaRepository.findNextPageByStockId(stock.getId(), fetchSize, lastResearchId);
+
+        final Boolean hasNext = researchList.size() == fetchSize;
+        if(hasNext){
+            researchList.remove(researchList.size() - 1);
+        }
+
+        final List<GetResearchPreviewResDto> list = researchList.stream()
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
-                            .map(researchTag -> researchTag.getTag())
+                            .map(ResearchTag::getTag)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
-                });
+                }).toList();
 
         return GetResearchPagingResDto.builder()
-                .getResearchPreviewResDtoList(slice.getContent())
-                .hasNext(slice.hasNext())
+                .getResearchPreviewResDtoList(list)
+                .hasNext(hasNext)
                 .build();
     }
 
     @Transactional(readOnly = true)
-    public GetResearchPagingResDto getResearchPagingByUser(final String userName, final Pageable pageable) {
+    public GetResearchPagingResDto getResearchPagingByUser(final String userName, final Long limit, final Long lastResearchId) {
 
-        User user = userJpaRepository.findByUserName(userName)
+        final User user = userJpaRepository.findByUserName(userName)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
-        Slice<GetResearchPreviewResDto> slice = researchJpaRepository.findAllByUserId(user.getId(), pageable)
+        final Long fetchSize = limit + 1;
+
+        final List<Research> researchList = (lastResearchId == 0L)
+                ? researchJpaRepository.findFirstPageByUserName(user.getUserName(), fetchSize)
+                : researchJpaRepository.findNextPageByUserName(user.getUserName(), fetchSize, lastResearchId);
+
+        final Boolean hasNext = researchList.size() == fetchSize;
+        if(hasNext){
+            researchList.remove(researchList.size() - 1);
+        }
+
+        final List<GetResearchPreviewResDto> list = researchList.stream()
                 .map(research -> {
                     List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
                             .stream()
-                            .map(researchTag -> researchTag.getTag())
+                            .map(ResearchTag::getTag)
                             .toList();
                     return GetResearchPreviewResDto.toDto(research, tagList);
-                });
+                }).toList();
 
         return GetResearchPagingResDto.builder()
-                .getResearchPreviewResDtoList(slice.getContent())
-                .hasNext(slice.hasNext())
+                .getResearchPreviewResDtoList(list)
+                .hasNext(hasNext)
                 .build();
     }
 

@@ -40,21 +40,21 @@ public class ResearchController {
     @GetMapping("/stocks/{stockId}/researches")
     public ResponseEntity<GetResearchPagingResDto> getResearchPagingByStock(
             @PathVariable("stockId") final Long stockId,
-            final Pageable pageable) {
+            @RequestParam(value = "lastResearchId", defaultValue = "0") final Long lastResearchId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(researchService.getResearchPagingByStock(stockId, pageable));
+                .body(researchService.getResearchPagingByStock(stockId, 10L, lastResearchId));
     }
 
     @GetMapping("/users/{userName}/researches")
     public ResponseEntity<GetResearchPagingResDto> getResearchPagingByUser(
             @PathVariable("userName") final String userName,
-            final Pageable pageable) {
+            @RequestParam(value = "lastResearchId", defaultValue = "0") final Long lastResearchId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(researchService.getResearchPagingByUser(userName, pageable));
+                .body(researchService.getResearchPagingByUser(userName, 10L, lastResearchId));
     }
 
     @PatchMapping("/researches/{researchId}/recommend")
