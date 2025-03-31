@@ -20,11 +20,11 @@ public interface ResearchJpaRepository extends JpaRepository<Research, Long> {
                                          @Param("limit") final Long limit,
                                          @Param("lastResearchId") final Long lastResearchId);
 
-    @Query("SELECT r FROM Research r WHERE r.stock.id = :stockId ORDER BY r.id DESC LIMIT :limit")
+    @Query("SELECT r FROM Research r LEFT JOIN FETCH r.user WHERE r.stock.id = :stockId ORDER BY r.id DESC LIMIT :limit")
     List<Research> findFirstPageByStockId(@Param("stockId") final Long stockId,
                                           @Param("limit") final Long limit);
 
-    @Query("SELECT r FROM Research r WHERE r.stock.id = :stockId AND r.id < :lastResearchId ORDER BY r.id DESC LIMIT :limit")
+    @Query("SELECT r FROM Research r LEFT JOIN FETCH r.user WHERE r.stock.id = :stockId AND r.id < :lastResearchId ORDER BY r.id DESC LIMIT :limit")
     List<Research> findNextPageByStockId(@Param("stockId") final Long stockId,
                                          @Param("limit") final Long limit,
                                          @Param("lastResearchId") final Long lastResearchId);

@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class Research extends DateTimeField {
     @JoinColumn(name = "stock_id")
     private Stock stock;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "research", cascade = CascadeType.PERSIST)
     private List<ResearchTag> researchTagList = new ArrayList<>();
 

@@ -19,14 +19,15 @@ import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -140,7 +141,7 @@ public class ResearchService {
 
         final List<GetResearchPreviewResDto> list = researchList.stream()
                 .map(research -> {
-                    List<Tag> tagList = researchTagRepository.findResearchTagsByResearchId(research.getId())
+                    List<Tag> tagList = research.getResearchTagList()
                             .stream()
                             .map(ResearchTag::getTag)
                             .toList();
