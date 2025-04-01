@@ -225,14 +225,6 @@ class ResearchServiceTest {
         when(stockRepository.findStockById(stockId)).thenReturn(Optional.of(stock));
         when(researchJpaRepository.findFirstPageByStockId(stockId, BATCH_SIZE))
                 .thenReturn(researchList);
-        for(Research research : researchList){
-            when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
-                    .thenReturn(tagList.stream().map(tag -> {
-                        ResearchTag rt = new ResearchTag();
-                        rt.setTag(tag);
-                        return rt;
-                    }).toList());
-        }
 
         // when
         GetResearchPagingResDto res = researchService.getResearchPagingByStock(stockId, 10L, 0L);
@@ -263,14 +255,6 @@ class ResearchServiceTest {
         when(stockRepository.findStockById(stockId)).thenReturn(Optional.of(stock));
         when(researchJpaRepository.findNextPageByStockId(stockId, BATCH_SIZE, 5L))
                 .thenReturn(researchList);
-        for(Research research : researchList){
-            when(researchTagRepository.findResearchTagsByResearchId(research.getId()))
-                    .thenReturn(tagList.stream().map(tag -> {
-                        ResearchTag rt = new ResearchTag();
-                        rt.setTag(tag);
-                        return rt;
-                    }).toList());
-        }
 
         // when
         GetResearchPagingResDto res = researchService.getResearchPagingByStock(stockId, 10L, 5L);
