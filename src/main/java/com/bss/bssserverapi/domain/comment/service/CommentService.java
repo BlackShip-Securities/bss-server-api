@@ -23,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -78,11 +80,14 @@ public class CommentService {
 
         Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<Comment> commentPage = commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId, pageable);
+        Page<Long> commentIdPage = commentJpaRepository.findCommentIdPagingByResearchId(researchId, pageable);
+        List<Long> commentIdList = commentIdPage.getContent();
+
+        List<Comment> commentList = commentJpaRepository.findCommentsWithUserAndResearchByIdIn(commentIdList);
 
         return GetCommentPagingResDto.builder()
-                .totalPage(Long.valueOf(commentPage.getTotalPages()))
-                .getCommentResDtoList(commentPage.stream()
+                .totalPage(Long.valueOf(commentIdPage.getTotalPages()))
+                .getCommentResDtoList(commentList.stream()
                         .map(GetCommentResDto::toDto)
                         .toList())
                 .build();

@@ -4,8 +4,6 @@ import com.bss.bssserverapi.domain.comment.Comment;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 public class GetCommentResDto {
@@ -19,9 +17,8 @@ public class GetCommentResDto {
     private LocalDateTime deletedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<GetCommentResDto> getReplyCommentResDtoList = new ArrayList<>();
 
-    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final Long recommendCount, final Boolean isDeleted, final LocalDateTime deletedAt, final LocalDateTime createdAt, final LocalDateTime updatedAt, final List<GetCommentResDto> getReplyCommentResDtoList) {
+    public GetCommentResDto(final Long id, final String content, final String userName, final Long childCommentCount, final Long recommendCount, final Boolean isDeleted, final LocalDateTime deletedAt, final LocalDateTime createdAt, final LocalDateTime updatedAt) {
 
         this.id = id;
         this.content = content;
@@ -32,14 +29,9 @@ public class GetCommentResDto {
         this.deletedAt = deletedAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.getReplyCommentResDtoList = getReplyCommentResDtoList;
     }
 
     static public GetCommentResDto toDto(final Comment comment) {
-
-        List<GetCommentResDto> getCommentResDtoList = comment.getChildCommentList().stream()
-                .map(GetCommentResDto::toDto)
-                .toList();
 
         return new GetCommentResDto(
                 comment.getId(),
@@ -50,18 +42,7 @@ public class GetCommentResDto {
                 comment.getIsDeleted(),
                 comment.getDeletedAt(),
                 comment.getCreatedAt(),
-                comment.getUpdatedAt(),
-                getCommentResDtoList
+                comment.getUpdatedAt()
         );
-    }
-
-    public void setGetReplyCommentResDtoList(final List<GetCommentResDto> getReplyCommentResDtoList){
-
-        this.getReplyCommentResDtoList = getReplyCommentResDtoList;
-    }
-
-    public void setContent(final String content) {
-
-        this.content = content;
     }
 }
