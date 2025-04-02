@@ -3,7 +3,7 @@ package com.bss.bssserverapi.domain.comment.service;
 import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.CommentRecommend;
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentPagingResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
 import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
@@ -15,6 +15,10 @@ import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,11 +74,16 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public GetCommentListResDto getCommentListByResearch(final Long researchId){
+    public GetCommentPagingResDto getCommentPagingByResearch(final Long researchId, final int page, final int limit){
 
-        return GetCommentListResDto.builder()
-                .getCommentResDtoList(commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId)
-                        .stream().map(GetCommentResDto::toDto)
+        Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Comment> commentPage = commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId, pageable);
+
+        return GetCommentPagingResDto.builder()
+                .totalPage(Long.valueOf(commentPage.getTotalPages()))
+                .getCommentResDtoList(commentPage.stream()
+                        .map(GetCommentResDto::toDto)
                         .toList())
                 .build();
     }

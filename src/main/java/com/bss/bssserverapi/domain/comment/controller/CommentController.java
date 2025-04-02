@@ -1,7 +1,7 @@
 package com.bss.bssserverapi.domain.comment.controller;
 
 import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentListResDto;
+import com.bss.bssserverapi.domain.comment.dto.GetCommentPagingResDto;
 import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
 import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
 import com.bss.bssserverapi.domain.comment.service.CommentService;
@@ -48,11 +48,14 @@ public class CommentController {
     }
 
     @GetMapping("/researches/{researchId}/comments")
-    public ResponseEntity<GetCommentListResDto> getCommentListByResearch(@PathVariable("researchId") final Long researchId) {
+    public ResponseEntity<GetCommentPagingResDto> getCommentPagingByResearch(
+            @PathVariable("researchId") final Long researchId,
+            @RequestParam(defaultValue = "0") final int page,
+            @RequestParam(defaultValue = "10") final int limit) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(commentService.getCommentListByResearch(researchId));
+                .body(commentService.getCommentPagingByResearch(researchId, page, limit));
     }
 
     @PatchMapping("/comments/{commentId}")
