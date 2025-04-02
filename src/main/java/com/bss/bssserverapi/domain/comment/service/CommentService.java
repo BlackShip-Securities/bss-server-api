@@ -2,10 +2,7 @@ package com.bss.bssserverapi.domain.comment.service;
 
 import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.CommentRecommend;
-import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentPagingResDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
-import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.*;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
 import com.bss.bssserverapi.domain.comment.repository.CommentRecommendJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
@@ -89,6 +86,16 @@ public class CommentService {
                 .totalPage(Long.valueOf(commentIdPage.getTotalPages()))
                 .getCommentResDtoList(commentList.stream()
                         .map(GetCommentResDto::toDto)
+                        .toList())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public GetReplyCommentListResDto getReplyCommentListByParentComment(final Long parentCommentId){
+
+        return GetReplyCommentListResDto.builder()
+                .getReplyCommentResDtoList(commentJpaRepository.findCommentsByParentCommentId(parentCommentId).stream()
+                        .map(GetReplyCommentResDto::toDto)
                         .toList())
                 .build();
     }

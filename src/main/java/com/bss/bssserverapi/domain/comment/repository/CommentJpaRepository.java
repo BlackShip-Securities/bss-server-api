@@ -30,4 +30,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
         WHERE c.id IN :commentIds
     """)
     List<Comment> findCommentsWithUserAndResearchByIdIn(final List<Long> commentIds);
+
+    @Query("SELECT c FROM Comment c WHERE c.parentComment.id = :parentCommentId ORDER BY c.id DESC")
+    List<Comment> findCommentsByParentCommentId(final Long parentCommentId);
 }
