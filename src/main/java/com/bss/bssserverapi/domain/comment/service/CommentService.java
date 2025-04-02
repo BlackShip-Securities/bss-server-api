@@ -80,7 +80,7 @@ public class CommentService {
         Page<Long> commentIdPage = commentJpaRepository.findCommentIdPagingByResearchId(researchId, pageable);
         List<Long> commentIdList = commentIdPage.getContent();
 
-        List<Comment> commentList = commentJpaRepository.findCommentsWithUserAndResearchByIdIn(commentIdList);
+        List<Comment> commentList = commentJpaRepository.findCommentsWithUserByIdIn(commentIdList);
 
         return GetCommentPagingResDto.builder()
                 .totalPage(Long.valueOf(commentIdPage.getTotalPages()))

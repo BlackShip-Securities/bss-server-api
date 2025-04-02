@@ -31,7 +31,7 @@ public class CommentDummyInitRunner implements ApplicationRunner {
 
         Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM comments", Long.class);
         if (count != null && count > 0) {
-            log.info("💬 Comment dummy already exists.");
+            log.info("🔍 Comment dummy already exists.");
             return;
         }
 
