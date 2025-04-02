@@ -28,11 +28,12 @@ public class UserDummyInitRunner implements ApplicationRunner {
     public void run(final ApplicationArguments args) {
 
         if (userJpaRepository.count() > 0) {
-            log.info("User Dummy data exists");
+            log.info("🔍 User dummy already exists.");
             return;
         }
 
         this.createUserDummy();
+        log.info("🎉 {}개 더미 User 데이터 삽입 완료!", 100);
     }
 
     private void createUserDummy() {
@@ -49,6 +50,5 @@ public class UserDummyInitRunner implements ApplicationRunner {
         }
 
         userJpaRepository.saveAll(userList);
-        log.info("user dummy saved.");
     }
 }
