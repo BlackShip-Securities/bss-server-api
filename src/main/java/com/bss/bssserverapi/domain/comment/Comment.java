@@ -17,7 +17,12 @@ import java.util.List;
 
 @Entity
 @Getter
-@Table(name = "comments")
+@Table(
+        name = "comments",
+        indexes = {
+                @Index(name = "idx_comment_paging", columnList = "research_id, parent_comment_id, id DESC")
+        }
+)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends DateTimeField {
 
