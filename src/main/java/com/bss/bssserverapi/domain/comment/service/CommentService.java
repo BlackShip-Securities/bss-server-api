@@ -51,14 +51,18 @@ public class CommentService {
     }
 
     @Transactional
-    public GetCommentResDto createReplyComment(final String userName, final Long researchId, final Long commentId, final CreateCommentReqDto createCommentReqDto) {
+    public GetCommentResDto createReplyComment(final String userName, final Long commentId, final CreateCommentReqDto createCommentReqDto) {
 
         User user = userJpaRepository.findByUserName(userName)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
-        Research research = researchJpaRepository.findById(researchId)
-                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.RESEARCH_NOT_FOUND));
         Comment parentComment = commentJpaRepository.findById(commentId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
+
+        if (parentComment.getParentComment() != null){
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.REPLY_TO_COMMENT_ONLY);
+        }
+
+        Research research = parentComment.getResearch();
 
         Comment comment = Comment.builder()
                 .content(createCommentReqDto.getContent())

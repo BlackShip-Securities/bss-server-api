@@ -32,16 +32,15 @@ public class CommentController {
     /**
      * 답글(대댓글) 작성
      * */
-    @PostMapping("/researches/{researchId}/comments/{commentId}/replyComments")
+    @PostMapping("/comments/{commentId}/replyComments")
     public ResponseEntity<GetCommentResDto> createReplyComment(
             @AuthenticationPrincipal final String userName,
-            @PathVariable("researchId") final Long researchId,
             @PathVariable("commentId") final Long commentId,
             @RequestBody final CreateCommentReqDto createCommentReqDto) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(commentService.createReplyComment(userName, researchId, commentId, createCommentReqDto));
+                .body(commentService.createReplyComment(userName, commentId, createCommentReqDto));
     }
 
     @GetMapping("/researches/{researchId}/comments")
