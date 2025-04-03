@@ -25,6 +25,7 @@ public enum ErrorCode {
     RESEARCH_TAG_DUPLICATED("B005", "Tags must be unique"),
     RESEARCH_NOT_FOUND("B006", "Research not found"),
     COMMENT_NOT_FOUND("B007", "Comment not found"),
+    REPLY_TO_COMMENT_ONLY("B008", "Replies can only be written to comments"),
 
 
 

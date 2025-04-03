@@ -58,6 +58,10 @@ public class CommentService {
         Comment parentComment = commentJpaRepository.findById(commentId)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.COMMENT_NOT_FOUND));
 
+        if (parentComment.getParentComment() != null){
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.REPLY_TO_COMMENT_ONLY);
+        }
+
         Research research = parentComment.getResearch();
 
         Comment comment = Comment.builder()
