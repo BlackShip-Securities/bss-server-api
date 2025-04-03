@@ -1,9 +1,6 @@
 package com.bss.bssserverapi.domain.comment.controller;
 
-import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentPagingResDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
-import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.*;
 import com.bss.bssserverapi.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -56,6 +53,15 @@ public class CommentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(commentService.getCommentPagingByResearch(researchId, page, limit));
+    }
+
+    @GetMapping("/comments/{parentCommentId}/replyComments")
+    public ResponseEntity<GetReplyCommentListResDto> getReplyCommentByComment(
+            @PathVariable("parentCommentId") final Long parentCommentId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(commentService.getReplyCommentListByParentComment(parentCommentId));
     }
 
     @PatchMapping("/comments/{commentId}")

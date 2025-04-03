@@ -2,10 +2,7 @@ package com.bss.bssserverapi.domain.comment.service;
 
 import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.CommentRecommend;
-import com.bss.bssserverapi.domain.comment.dto.CreateCommentReqDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentPagingResDto;
-import com.bss.bssserverapi.domain.comment.dto.GetCommentResDto;
-import com.bss.bssserverapi.domain.comment.dto.UpdateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.*;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
 import com.bss.bssserverapi.domain.comment.repository.CommentRecommendJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
@@ -22,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -78,12 +77,25 @@ public class CommentService {
 
         Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"));
 
-        Page<Comment> commentPage = commentJpaRepository.findCommentsByResearchIdAndParentCommentIsNull(researchId, pageable);
+        Page<Long> commentIdPage = commentJpaRepository.findCommentIdPagingByResearchId(researchId, pageable);
+        List<Long> commentIdList = commentIdPage.getContent();
+
+        List<Comment> commentList = commentJpaRepository.findCommentsWithUserByIdIn(commentIdList);
 
         return GetCommentPagingResDto.builder()
-                .totalPage(Long.valueOf(commentPage.getTotalPages()))
-                .getCommentResDtoList(commentPage.stream()
+                .totalPage(Long.valueOf(commentIdPage.getTotalPages()))
+                .getCommentResDtoList(commentList.stream()
                         .map(GetCommentResDto::toDto)
+                        .toList())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public GetReplyCommentListResDto getReplyCommentListByParentComment(final Long parentCommentId){
+
+        return GetReplyCommentListResDto.builder()
+                .getReplyCommentResDtoList(commentJpaRepository.findCommentsByParentCommentId(parentCommentId).stream()
+                        .map(GetReplyCommentResDto::toDto)
                         .toList())
                 .build();
     }
