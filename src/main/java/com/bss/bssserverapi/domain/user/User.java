@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.domain.user;
 
+import com.bss.bssserverapi.domain.auth.OAuth2SocialType;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
@@ -27,14 +28,21 @@ public class User extends DateTimeField {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private OAuth2SocialType oAuth2SocialType;
+
+    private String oAuthSocialId;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Research> researchList = new ArrayList<>();
 
     @Builder
-    public User(final String userName, final String password) {
+    public User(final String userName, final String password, final OAuth2SocialType oAuth2SocialType, final String oAuthSocialId) {
 
         this.userName = userName;
         this.password = password;
+        this.oAuth2SocialType = oAuth2SocialType;
+        this.oAuthSocialId = oAuthSocialId;
     }
 
     public void addResearch(final Research research) {

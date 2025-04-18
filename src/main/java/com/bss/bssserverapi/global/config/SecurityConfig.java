@@ -4,11 +4,13 @@ import com.bss.bssserverapi.domain.auth.filter.ExceptionHandlerFilter;
 import com.bss.bssserverapi.domain.auth.filter.GlobalAccessDeniedHandler;
 import com.bss.bssserverapi.domain.auth.filter.GlobalAuthenticationEntryPoint;
 import com.bss.bssserverapi.domain.auth.filter.JwtAuthenticationFilter;
+import com.bss.bssserverapi.domain.auth.service.OAuth2Service;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,15 +29,18 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtProvider jwtProvider;
+    private final OAuth2Service oAuth2Service;
 
     public SecurityConfig(
             @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
-            JwtProvider jwtProvider) {
+            final JwtProvider jwtProvider,
+            final OAuth2Service oAuth2Service) {
 
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.corsConfigurationSource = corsConfigurationSource;
         this.jwtProvider = jwtProvider;
+        this.oAuth2Service = oAuth2Service;
     }
 
     @Bean
@@ -70,6 +75,7 @@ public class SecurityConfig {
                 )
                 .permitAll()
                 .requestMatchers(
+                        "/oauth/login",
                         "/api/v1/auth/login", "/api/v1/auth/refresh",
                         "/api/v1/users/signup"
                 )
@@ -77,6 +83,12 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
         );
+
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(oAuth2Service)));
+
 
         http.exceptionHandling(config -> config
                 .authenticationEntryPoint(new GlobalAuthenticationEntryPoint(handlerExceptionResolver))
