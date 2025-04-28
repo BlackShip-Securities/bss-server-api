@@ -1,9 +1,9 @@
 package com.bss.bssserverapi.auth;
 
-import com.bss.bssserverapi.domain.auth.dto.LoginUserReqDto;
-import com.bss.bssserverapi.domain.auth.dto.LoginUserResWithCookieDto;
-import com.bss.bssserverapi.domain.auth.dto.LogoutUserResDto;
-import com.bss.bssserverapi.domain.auth.dto.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LogoutUserResDto;
+import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;

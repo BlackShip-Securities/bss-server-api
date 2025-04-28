@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.auth.dto.oAuth2;
+package com.bss.bssserverapi.domain.auth.dto;
 
 public interface OAuth2UserInfo {
 

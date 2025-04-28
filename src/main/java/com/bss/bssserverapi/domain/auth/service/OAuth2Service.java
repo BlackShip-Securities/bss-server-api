@@ -1,8 +1,8 @@
 package com.bss.bssserverapi.domain.auth.service;
 
-import com.bss.bssserverapi.domain.auth.dto.oAuth2.CustomOAuth2User;
-import com.bss.bssserverapi.domain.auth.dto.oAuth2.GoogleOAuth2UserInfo;
-import com.bss.bssserverapi.domain.auth.dto.oAuth2.OAuth2UserInfo;
+import com.bss.bssserverapi.domain.auth.dto.CustomOAuth2User;
+import com.bss.bssserverapi.domain.auth.dto.GoogleOAuth2UserInfo;
+import com.bss.bssserverapi.domain.auth.dto.OAuth2UserInfo;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;

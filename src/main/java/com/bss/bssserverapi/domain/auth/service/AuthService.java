@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.domain.auth.service;
 
-import com.bss.bssserverapi.domain.auth.dto.*;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.*;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;

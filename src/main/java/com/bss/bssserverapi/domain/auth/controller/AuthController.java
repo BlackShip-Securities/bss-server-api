@@ -1,9 +1,9 @@
 package com.bss.bssserverapi.domain.auth.controller;
 
-import com.bss.bssserverapi.domain.auth.dto.LoginUserReqDto;
-import com.bss.bssserverapi.domain.auth.dto.LoginUserResDto;
-import com.bss.bssserverapi.domain.auth.dto.LoginUserResWithCookieDto;
-import com.bss.bssserverapi.domain.auth.dto.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

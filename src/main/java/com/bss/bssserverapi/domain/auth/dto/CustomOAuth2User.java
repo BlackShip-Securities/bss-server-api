@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.auth.dto.oAuth2;
+package com.bss.bssserverapi.domain.auth.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
