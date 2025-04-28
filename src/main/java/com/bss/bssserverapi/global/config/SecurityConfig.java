@@ -84,8 +84,7 @@ public class SecurityConfig {
                 .authenticated()
         );
 
-        http
-                .oauth2Login((oauth2) -> oauth2
+        http.oauth2Login((oauth2) -> oauth2
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(oAuth2Service)));
 

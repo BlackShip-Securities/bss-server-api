@@ -14,13 +14,13 @@ public class GoogleOAuth2UserInfo implements OAuth2UserInfo {
     }
 
     @Override
-    public String getProvider() {
+    public OAuth2SocialType getSocialType() {
 
-        return OAuth2SocialType.GOOGLE.name();
+        return OAuth2SocialType.GOOGLE;
     }
 
     @Override
-    public String getProviderId() {
+    public String getSocialId() {
 
         return attribute.get("sub").toString();
     }

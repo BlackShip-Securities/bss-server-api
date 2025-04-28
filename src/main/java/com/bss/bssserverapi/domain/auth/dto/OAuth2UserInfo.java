@@ -1,9 +1,11 @@
 package com.bss.bssserverapi.domain.auth.dto;
 
+import com.bss.bssserverapi.domain.auth.OAuth2SocialType;
+
 public interface OAuth2UserInfo {
 
-    String getProvider();
-    String getProviderId();
+    OAuth2SocialType getSocialType();
+    String getSocialId();
     String getEmail();
     String getName();
 }
