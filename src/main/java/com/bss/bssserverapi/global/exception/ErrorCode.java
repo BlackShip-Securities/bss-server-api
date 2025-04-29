@@ -18,7 +18,6 @@ public enum ErrorCode {
     INVALID_TOKEN("A008", "Token is invalid"),
     OAUTH2_FAILED("A009", "OAuth login failed"),
 
-
     // business
     STOCK_NOT_FOUND("B001", "Stock not found"),
     RESEARCH_INVALID_DATE_RANGE("B002", "Start date must be before the end date"),

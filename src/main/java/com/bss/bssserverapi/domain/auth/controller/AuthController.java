@@ -21,12 +21,13 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto){
+    @PatchMapping("/signup")
+    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto,
+                                        @AuthenticationPrincipal final String guestUserName){
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(authService.signupUser(signupUserReqDto));
+                .body(authService.signupUser(signupUserReqDto, guestUserName));
     }
 
     @PostMapping("/login")
@@ -52,11 +53,11 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal final String userId) {
+    public ResponseEntity<?> logout(@AuthenticationPrincipal final String userName) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, authService.logout(userId).getCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, authService.logout(userName).getCookie().toString())
                 .body("");
     }
 

@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.domain.user;
 
 import com.bss.bssserverapi.domain.auth.OAuth2SocialType;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
@@ -52,6 +53,13 @@ public class User extends DateTimeField {
         this.email = email;
         this.socialType = socialType;
         this.socialId = socialId;
+    }
+
+    public void signup(final String userName, final String password, final RoleType roleType){
+
+        this.userName = userName;
+        this.password = password;
+        this.roleType = roleType;
     }
 
     public void addResearch(final Research research) {

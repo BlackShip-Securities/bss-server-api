@@ -5,6 +5,7 @@ import com.bss.bssserverapi.domain.auth.dto.response.*;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
+import com.bss.bssserverapi.domain.user.RoleType;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
@@ -29,7 +30,10 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto){
+    public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto, final String guestUserName){
+
+        User user = userJpaRepository.findByUserName(guestUserName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         if(userJpaRepository.existsByUserName(signupUserReqDto.getUserName())){
 
@@ -41,13 +45,10 @@ public class AuthService {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
         }
 
-        User user = userJpaRepository.save(User.builder()
-                .userName(signupUserReqDto.getUserName())
-                .password(bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()))
-                .build());
+        user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.USER);
 
         return SignupUserResDto.builder()
-                .userName(user.getUserName())
+                .userName(userJpaRepository.save(user).getUserName())
                 .build();
     }
 

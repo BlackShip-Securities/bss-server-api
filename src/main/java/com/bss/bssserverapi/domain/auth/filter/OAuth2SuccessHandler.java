@@ -33,8 +33,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(HttpHeaders.AUTHORIZATION, accessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, CookieProvider.createResponseCookie(refreshToken, jwtProvider.getRefreshTokenExpiredTime() / 1000).toString());
 
+        // TODO: 회원 가입 완료 폼 페이지로 이동
         if(role.equals(RoleType.GUEST.name())) {
-            response.sendRedirect("/guest");
+            response.sendRedirect("/swagger-ui/index.html");
         }
         else {
             response.sendRedirect("/user");
