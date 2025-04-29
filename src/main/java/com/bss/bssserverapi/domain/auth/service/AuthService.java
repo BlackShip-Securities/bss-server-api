@@ -37,8 +37,8 @@ public class AuthService {
             throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.PASSWORD_MISMATCH);
         }
 
-        String accessToken = jwtProvider.createAccessToken(user.getUserName());
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserName());
+        String accessToken = jwtProvider.createAccessToken(user.getUserName(), user.getRoleType().name());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserName(), user.getRoleType().name());
 
         authRepository.deleteByUserName(user.getUserName());
         authRepository.save(user.getUserName(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
@@ -63,8 +63,9 @@ public class AuthService {
         jwtProvider.validateToken(refreshToken);
 
         String userName = jwtProvider.getUserName(refreshToken);
-        String accessToken = jwtProvider.createAccessToken(userName);
-        String newRefreshToken = jwtProvider.createRefreshToken(userName);
+        String role = jwtProvider.getRole(refreshToken);
+        String accessToken = jwtProvider.createAccessToken(userName, role);
+        String newRefreshToken = jwtProvider.createRefreshToken(userName, role);
 
         authRepository.deleteByUserName(userName);
         authRepository.save(userName, newRefreshToken, jwtProvider.getExpiredDate(newRefreshToken));

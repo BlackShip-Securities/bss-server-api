@@ -33,7 +33,8 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         User user = getOrCreateUser(oAuth2UserInfo);
 
         return CustomOAuth2User.builder()
-                .email(user.getEmail())
+                .name(user.getUserName())
+                .role(user.getRoleType().name())
                 .build();
     }
 
@@ -42,6 +43,7 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         if (registrationId.equals(GOOGLE)) {
             return new GoogleOAuth2UserInfo(oAuth2User.getAttributes());
         }
+        // TODO: APPLE, etc...
         return new GoogleOAuth2UserInfo(oAuth2User.getAttributes());
     }
 

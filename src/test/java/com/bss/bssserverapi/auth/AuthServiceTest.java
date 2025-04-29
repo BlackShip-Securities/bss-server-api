@@ -66,8 +66,8 @@ class AuthServiceTest {
 
         when(userJpaRepository.findByUserName(userName)).thenReturn(Optional.of(user));
         when(bCryptPasswordEncoder.matches(password, hashedPassword)).thenReturn(true);
-        when(jwtProvider.createAccessToken(userName)).thenReturn(accessToken);
-        when(jwtProvider.createRefreshToken(userName)).thenReturn(refreshToken);
+        when(jwtProvider.createAccessToken(userName, "ROLE_USER")).thenReturn(accessToken);
+        when(jwtProvider.createRefreshToken(userName, "ROLE_USER")).thenReturn(refreshToken);
         doNothing().when(authRepository).deleteByUserName(userName);
         doNothing().when(authRepository).save(eq(userName), eq(refreshToken), any());
 
@@ -145,8 +145,8 @@ class AuthServiceTest {
 
         doNothing().when(jwtProvider).validateToken(refreshToken);
         when(jwtProvider.getUserName(refreshToken)).thenReturn(userName);
-        when(jwtProvider.createAccessToken(userName)).thenReturn(newAccessToken);
-        when(jwtProvider.createRefreshToken(userName)).thenReturn(newRefreshToken);
+        when(jwtProvider.createAccessToken(userName, "ROLE_USER")).thenReturn(newAccessToken);
+        when(jwtProvider.createRefreshToken(userName, "ROLE_USER")).thenReturn(newRefreshToken);
         doNothing().when(authRepository).deleteByUserName(userName);
         doNothing().when(authRepository).save(eq(userName), eq(newRefreshToken), any());
 

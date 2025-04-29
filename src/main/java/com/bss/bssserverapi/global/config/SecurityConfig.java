@@ -18,6 +18,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -30,17 +32,23 @@ public class SecurityConfig {
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtProvider jwtProvider;
     private final OAuth2Service oAuth2Service;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     public SecurityConfig(
             @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
             final JwtProvider jwtProvider,
-            final OAuth2Service oAuth2Service) {
+            final OAuth2Service oAuth2Service,
+            final AuthenticationSuccessHandler authenticationSuccessHandler,
+            final AuthenticationFailureHandler authenticationFailureHandler) {
 
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.corsConfigurationSource = corsConfigurationSource;
         this.jwtProvider = jwtProvider;
         this.oAuth2Service = oAuth2Service;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
     @Bean
@@ -75,7 +83,7 @@ public class SecurityConfig {
                 )
                 .permitAll()
                 .requestMatchers(
-                        "/oauth/login",
+                        "/login/oauth2/code/google",
                         "/api/v1/auth/login", "/api/v1/auth/refresh",
                         "/api/v1/users/signup"
                 )
@@ -85,9 +93,9 @@ public class SecurityConfig {
         );
 
         http.oauth2Login((oauth2) -> oauth2
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
-                                .userService(oAuth2Service)));
-
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig.userService(oAuth2Service))
+                        .successHandler(authenticationSuccessHandler)
+                        .failureHandler(authenticationFailureHandler));
 
         http.exceptionHandling(config -> config
                 .authenticationEntryPoint(new GlobalAuthenticationEntryPoint(handlerExceptionResolver))

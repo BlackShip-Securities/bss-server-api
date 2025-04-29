@@ -103,7 +103,7 @@ public class AuthControllerTest {
     void tokenValid_Fail_Expired() throws Exception {
 
         // given
-        String accessToken = jwtProvider.createExpiredAccessToken("bss_test");
+        String accessToken = jwtProvider.createExpiredAccessToken("bss_test", "ROLE_USER");
 
         // when & then
         mockMvc.perform(
@@ -121,7 +121,7 @@ public class AuthControllerTest {
     void tokenValid_Fail_Tampered() throws Exception {
 
         // given
-        String accessToken = jwtProvider.createAccessToken("bss_test");
+        String accessToken = jwtProvider.createAccessToken("bss_test", "ROLE_USER");
         accessToken = jwtProvider.createTamperedAccessToken(accessToken, "bss_admin");
 
         // when & then

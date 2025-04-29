@@ -40,6 +40,11 @@ public class JwtProvider {
         return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().get("userName", String.class);
     }
 
+    public String getRole(final String token){
+
+        return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
+    }
+
     public String getType(final String token){
 
         return Jwts.parser().verifyWith(this.secretKey).build().parseSignedClaims(token).getPayload().get("type", String.class);
@@ -50,22 +55,24 @@ public class JwtProvider {
         Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
     }
 
-    public String createAccessToken(final String userName){
+    public String createAccessToken(final String userName, final String role){
 
         return Jwts.builder()
                 .claim("userName", userName)
                 .claim("type", "accessToken")
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + this.accessTokenExpiredTime))
                 .signWith(this.secretKey)
                 .compact();
     }
 
-    public String createRefreshToken(final String userName){
+    public String createRefreshToken(final String userName, final String role){
 
         return Jwts.builder()
                 .claim("userName", userName)
                 .claim("type", "refreshToken")
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + this.refreshTokenExpiredTime))
                 .signWith(this.secretKey)
@@ -89,11 +96,12 @@ public class JwtProvider {
         return tokenParts[0] + "." + tamperedPayload + "." + tokenParts[2];
     }
 
-    public String createExpiredAccessToken(final String userName){
+    public String createExpiredAccessToken(final String userName, final String role){
 
         return Jwts.builder()
                 .claim("userName", userName)
                 .claim("type", "accessToken")
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() - 1))
                 .signWith(this.secretKey)

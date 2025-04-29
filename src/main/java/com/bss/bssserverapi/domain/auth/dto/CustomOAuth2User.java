@@ -15,16 +15,14 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class CustomOAuth2User implements OAuth2User {
 
-    private String role;
     private String name;
-    private String email;
+    private String role;
 
     @Builder
-    public CustomOAuth2User(final String role, final String name, final String email) {
+    public CustomOAuth2User(final String name, final String role) {
 
-        this.role = role;
         this.name = name;
-        this.email = email;
+        this.role = role;
     }
 
     @Override
@@ -46,10 +44,5 @@ public class CustomOAuth2User implements OAuth2User {
     public String getName() {
 
         return this.name;
-    }
-
-    public String getEmail() {
-
-        return email;
     }
 }
