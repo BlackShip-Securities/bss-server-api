@@ -1,8 +1,8 @@
 //package com.bss.bssserverapi.domain.user;
 //
 //import com.bss.bssserverapi.domain.user.controller.UserController;
-//import com.bss.bssserverapi.domain.user.dto.SignupUserReqDto;
-//import com.bss.bssserverapi.domain.user.dto.SignupUserResDto;
+//import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
+//import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
 //import com.bss.bssserverapi.domain.user.service.UserService;
 //import com.bss.bssserverapi.global.config.SecurityConfig;
 //import com.bss.bssserverapi.global.exception.ErrorCode;

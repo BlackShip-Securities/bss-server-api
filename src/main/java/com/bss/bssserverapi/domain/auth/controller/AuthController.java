@@ -5,6 +5,7 @@ import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
 import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto){
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(authService.signupUser(signupUserReqDto));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginUserResDto> login(@Valid @RequestBody final LoginUserReqDto loginUserReqDto){

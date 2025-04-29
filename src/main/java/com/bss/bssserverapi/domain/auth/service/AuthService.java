@@ -6,6 +6,8 @@ import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.domain.user.User;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
 import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
@@ -25,6 +27,29 @@ public class AuthService {
     private final UserJpaRepository userJpaRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider jwtProvider;
+
+    @Transactional
+    public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto){
+
+        if(userJpaRepository.existsByUserName(signupUserReqDto.getUserName())){
+
+            throw new GlobalException(HttpStatus.CONFLICT, ErrorCode.USER_ALREADY_EXISTS);
+        }
+
+        if(!signupUserReqDto.getPassword().equals(signupUserReqDto.getPasswordConfirmation())){
+
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
+        }
+
+        User user = userJpaRepository.save(User.builder()
+                .userName(signupUserReqDto.getUserName())
+                .password(bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()))
+                .build());
+
+        return SignupUserResDto.builder()
+                .userName(user.getUserName())
+                .build();
+    }
 
     @Transactional
     public LoginUserResWithCookieDto login(final LoginUserReqDto loginUserReqDto){
