@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.research.dto;
+package com.bss.bssserverapi.domain.research.dto.req;
 
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreateResearchReqDto {
 
     @NotBlank

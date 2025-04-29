@@ -1,14 +1,11 @@
-package com.bss.bssserverapi.domain.comment.dto;
+package com.bss.bssserverapi.domain.comment.dto.res;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GetCommentPagingResDto {
 
     private Long totalPage;

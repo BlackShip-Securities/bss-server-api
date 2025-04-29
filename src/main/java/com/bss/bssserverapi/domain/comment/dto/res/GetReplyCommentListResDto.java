@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.comment.dto;
+package com.bss.bssserverapi.domain.comment.dto.res;
 
 import lombok.Builder;
 import lombok.Getter;

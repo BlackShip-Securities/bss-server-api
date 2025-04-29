@@ -2,7 +2,12 @@ package com.bss.bssserverapi.domain.comment.service;
 
 import com.bss.bssserverapi.domain.comment.Comment;
 import com.bss.bssserverapi.domain.comment.CommentRecommend;
-import com.bss.bssserverapi.domain.comment.dto.*;
+import com.bss.bssserverapi.domain.comment.dto.req.CreateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.req.UpdateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetCommentPagingResDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetCommentResDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetReplyCommentListResDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetReplyCommentResDto;
 import com.bss.bssserverapi.domain.comment.repository.CommentJpaRepository;
 import com.bss.bssserverapi.domain.comment.repository.CommentRecommendJpaRepository;
 import com.bss.bssserverapi.domain.research.Research;
@@ -80,9 +85,11 @@ public class CommentService {
     public GetCommentPagingResDto getCommentPagingByResearch(final Long researchId, final int page, final int limit){
 
         Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"));
-
+        System.out.println("pageable = " + pageable);
         Page<Long> commentIdPage = commentJpaRepository.findCommentIdPagingByResearchId(researchId, pageable);
+        System.out.println("commentIdPage = " + commentIdPage);
         List<Long> commentIdList = commentIdPage.getContent();
+        System.out.println("commentIdList = " + commentIdList);
 
         List<Comment> commentList = commentJpaRepository.findCommentsWithUserByIdIn(commentIdList);
 

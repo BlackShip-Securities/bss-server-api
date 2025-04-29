@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.research.dto;
+package com.bss.bssserverapi.domain.research.dto.res;
 
 import com.bss.bssserverapi.domain.research.Research;
 import com.bss.bssserverapi.domain.tag.Tag;
