@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -104,12 +105,12 @@ public class SecurityConfig {
 
         http.addFilterBefore(
                 new ExceptionHandlerFilter(handlerExceptionResolver),
-                UsernamePasswordAuthenticationFilter.class
+                OAuth2LoginAuthenticationFilter.class
         );
 
         http.addFilterBefore(
                 new JwtAuthenticationFilter(this.jwtProvider),
-                UsernamePasswordAuthenticationFilter.class
+                OAuth2LoginAuthenticationFilter.class
         );
 
 
