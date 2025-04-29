@@ -58,8 +58,12 @@ public class AuthService {
         User user = userJpaRepository.findByUserName(loginUserReqDto.getUserName())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
-        if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
+        if(user.getRoleType() == RoleType.GUEST) {
 
+            throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.SIGNUP_NOT_COMPLETED);
+        }
+
+        if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
             throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.PASSWORD_MISMATCH);
         }
 

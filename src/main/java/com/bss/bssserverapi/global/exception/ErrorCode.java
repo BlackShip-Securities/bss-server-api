@@ -17,6 +17,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN("A007", "Token is expired"),
     INVALID_TOKEN("A008", "Token is invalid"),
     OAUTH2_FAILED("A009", "OAuth login failed"),
+    SIGNUP_NOT_COMPLETED("A010", "Signup is not completed"),
 
     // business
     STOCK_NOT_FOUND("B001", "Stock not found"),
