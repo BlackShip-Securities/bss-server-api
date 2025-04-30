@@ -6,7 +6,10 @@ import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
 import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResDto;
 import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.filter.OAuth2FailureHandler;
+import com.bss.bssserverapi.domain.auth.filter.OAuth2SuccessHandler;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
+import com.bss.bssserverapi.domain.auth.service.OAuth2Service;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.global.config.SecurityConfig;
@@ -22,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -32,11 +36,14 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = AuthController.class)
-@Import({SecurityConfig.class, JwtProvider.class})
+@Import({SecurityConfig.class, JwtProvider.class, OAuth2SuccessHandler.class, OAuth2FailureHandler.class})
 public class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private OAuth2Service oAuth2Service;
 
     @MockBean
     @Qualifier("corsConfigurationSource")
