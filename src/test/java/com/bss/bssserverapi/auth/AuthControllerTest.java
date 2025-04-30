@@ -2,10 +2,8 @@ package com.bss.bssserverapi.auth;
 
 import com.bss.bssserverapi.domain.auth.controller.AuthController;
 import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
-import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
-import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
-import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResDto;
-import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.*;
 import com.bss.bssserverapi.domain.auth.filter.OAuth2FailureHandler;
 import com.bss.bssserverapi.domain.auth.filter.OAuth2SuccessHandler;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
@@ -25,11 +23,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -57,6 +56,73 @@ public class AuthControllerTest {
 
     @Autowired
     private JwtProvider jwtProvider;
+
+    @Test
+    @DisplayName("회원 가입 성공")
+    void createUser_Success() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userName("bss_test")
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
+                .build();
+
+        SignupUserResDto res = SignupUserResDto.builder()
+                .userName("bss_test")
+                .build();
+
+        given(authService.signupUser(any(SignupUserReqDto.class), any(String.class))).willReturn(res);
+
+        // when & then
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.userName").value("bss_test"));
+    }
+
+    @Test
+    @DisplayName("회원 가입 실패 - 필수 필드 누락")
+    void createUser_Fail_MissingFields() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
+                .build();
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isInternalServerError())
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(content().string(not(isEmptyOrNullString())));
+    }
+
+    @Test
+    @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
+    void createUser_Fail_InvalidFieldValues() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userName("bss_test")
+                .password("invalidPW")
+                .passwordConfirmation("invalidPW")
+                .build();
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isInternalServerError())
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(content().string(not(isEmptyOrNullString())));
+    }
 
     @Test
     @DisplayName("인증(로그인) 성공")

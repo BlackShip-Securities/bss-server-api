@@ -45,7 +45,7 @@ public class AuthService {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
         }
 
-        user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.USER);
+        user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.ROLE_USER);
 
         return SignupUserResDto.builder()
                 .userName(userJpaRepository.save(user).getUserName())
@@ -58,7 +58,7 @@ public class AuthService {
         User user = userJpaRepository.findByUserName(loginUserReqDto.getUserName())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
-        if(user.getRoleType() == RoleType.GUEST) {
+        if(user.getRoleType() == RoleType.ROLE_GUEST) {
 
             throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.SIGNUP_NOT_COMPLETED);
         }

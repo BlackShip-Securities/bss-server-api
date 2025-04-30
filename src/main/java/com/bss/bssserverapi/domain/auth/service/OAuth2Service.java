@@ -62,7 +62,7 @@ public class OAuth2Service extends DefaultOAuth2UserService {
         return userJpaRepository.save(User.builder()
                 .userName(userName)
                 .password(userName)
-                .roleType(RoleType.GUEST)
+                .roleType(RoleType.ROLE_GUEST)
                 .email(oAuth2UserInfo.getEmail())
                 .socialType(socialType)
                 .socialId(socialId)
