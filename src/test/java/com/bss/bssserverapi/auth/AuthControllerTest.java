@@ -1,14 +1,21 @@
 package com.bss.bssserverapi.auth;
 
+import com.bss.bssserverapi.auth.support.WithCustomMockUser;
 import com.bss.bssserverapi.domain.auth.controller.AuthController;
-import com.bss.bssserverapi.domain.auth.dto.*;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.*;
+import com.bss.bssserverapi.domain.auth.filter.OAuth2FailureHandler;
+import com.bss.bssserverapi.domain.auth.filter.OAuth2SuccessHandler;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
+import com.bss.bssserverapi.domain.auth.service.OAuth2Service;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +29,22 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = AuthController.class)
-@Import({SecurityConfig.class, JwtProvider.class})
+@Import({SecurityConfig.class, JwtProvider.class, OAuth2SuccessHandler.class, OAuth2FailureHandler.class})
 public class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private OAuth2Service oAuth2Service;
 
     @MockBean
     @Qualifier("corsConfigurationSource")
@@ -48,7 +60,77 @@ public class AuthControllerTest {
     private JwtProvider jwtProvider;
 
     @Test
-    @DisplayName("인증(로그인) 성공")
+    @DisplayName("회원 가입 성공")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
+    void createUser_Success() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userName("bss_guest")
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
+                .build();
+
+        SignupUserResDto res = SignupUserResDto.builder()
+                .userName("bss_guest")
+                .build();
+
+        given(authService.signupUser(any(SignupUserReqDto.class), any(String.class))).willReturn(res);
+
+        // when & then
+        mockMvc.perform(
+                MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userName").value("bss_guest"));
+    }
+
+    @Test
+    @DisplayName("회원 가입 실패 - 필수 필드 누락")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
+    void createUser_Fail_MissingFields() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .password("Qq12341234@")
+                .passwordConfirmation("Qq12341234@")
+                .build();
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string(not(isEmptyOrNullString())));
+    }
+
+    @Test
+    @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
+    void createUser_Fail_InvalidFieldValues() throws Exception {
+
+        // given
+        SignupUserReqDto req = SignupUserReqDto.builder()
+                .userName("bss_test")
+                .password("invalidPW")
+                .passwordConfirmation("invalidPW")
+                .build();
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(req)))
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string(not(isEmptyOrNullString())));
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
     void login_Success() throws Exception {
 
         // given
@@ -80,8 +162,29 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("인가 실패 - 액세스 토큰 없음")
-    void authorization_Fail_NoAccessToken() throws Exception {
+    @DisplayName("로그아웃 성공")
+    @WithCustomMockUser(userName = "bss_user", role = "ROLE_USER")
+    void logout_Success() throws Exception {
+
+        // given
+        given(authService.logout(anyString()))
+                .willReturn(LogoutUserResDto.builder()
+                        .cookie(CookieProvider.deleteResponseCookie())
+                        .build());
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.delete("/api/v1/auth/logout")
+                                .contentType(MediaType.APPLICATION_JSON))
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isOk())
+                .andExpect(content().string(""))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("refresh_token=;")));
+    }
+
+    @Test
+    @DisplayName("인증 실패 - 액세스 토큰 없음")
+    void authentication_Fail_NoAccessToken() throws Exception {
 
         // when & then
         mockMvc.perform(
@@ -93,13 +196,12 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.message").value(ErrorCode.UNAUTHENTICATED.getMessage()));
     }
 
-
     @Test
     @DisplayName("액세스 토큰 검증 실패 - 만료 시간")
     void tokenValid_Fail_Expired() throws Exception {
 
         // given
-        String accessToken = jwtProvider.createExpiredAccessToken("bss_test");
+        String accessToken = jwtProvider.createExpiredAccessToken("bss_test", "ROLE_USER");
 
         // when & then
         mockMvc.perform(
@@ -117,7 +219,7 @@ public class AuthControllerTest {
     void tokenValid_Fail_Tampered() throws Exception {
 
         // given
-        String accessToken = jwtProvider.createAccessToken("bss_test");
+        String accessToken = jwtProvider.createAccessToken("bss_test", "ROLE_USER");
         accessToken = jwtProvider.createTamperedAccessToken(accessToken, "bss_admin");
 
         // when & then

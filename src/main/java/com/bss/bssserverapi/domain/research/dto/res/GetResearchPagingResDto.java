@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.research.dto;
+package com.bss.bssserverapi.domain.research.dto.res;
 
 import lombok.Builder;
 import lombok.Getter;

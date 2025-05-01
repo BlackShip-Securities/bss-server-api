@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.comment.dto;
+package com.bss.bssserverapi.domain.comment.dto.req;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -8,9 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class CreateCommentReqDto {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UpdateCommentReqDto {
 
     @NotBlank
     @Size(max = 1000)

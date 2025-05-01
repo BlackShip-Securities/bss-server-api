@@ -1,12 +1,11 @@
 package com.bss.bssserverapi.domain.research.controller;
 
-import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
-import com.bss.bssserverapi.domain.research.dto.GetResearchPagingResDto;
-import com.bss.bssserverapi.domain.research.dto.GetResearchResDto;
+import com.bss.bssserverapi.domain.research.dto.req.CreateResearchReqDto;
+import com.bss.bssserverapi.domain.research.dto.res.GetResearchPagingResDto;
+import com.bss.bssserverapi.domain.research.dto.res.GetResearchResDto;
 import com.bss.bssserverapi.domain.research.service.ResearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,6 +1,10 @@
 package com.bss.bssserverapi.domain.comment.controller;
 
-import com.bss.bssserverapi.domain.comment.dto.*;
+import com.bss.bssserverapi.domain.comment.dto.req.CreateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.req.UpdateCommentReqDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetCommentPagingResDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetCommentResDto;
+import com.bss.bssserverapi.domain.comment.dto.res.GetReplyCommentListResDto;
 import com.bss.bssserverapi.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,8 +50,8 @@ public class CommentController {
     @GetMapping("/researches/{researchId}/comments")
     public ResponseEntity<GetCommentPagingResDto> getCommentPagingByResearch(
             @PathVariable("researchId") final Long researchId,
-            @RequestParam(defaultValue = "0") final int page,
-            @RequestParam(defaultValue = "10") final int limit) {
+            @RequestParam(value = "page", defaultValue = "0") final int page,
+            @RequestParam(value = "limit", defaultValue = "10") final int limit) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)

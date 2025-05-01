@@ -21,11 +21,15 @@ jobs:
         run: |
           mkdir -p src/main/resources
           mkdir -p src/main/resources/mysql
+          mkdir -p src/main/resources/oauth
           echo -e "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
           echo -e "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
           echo -e "${{ secrets.APPLICATION_LOCAL_MYSQL }}" > src/main/resources/mysql/application-local-mysql.yml
           echo -e "${{ secrets.APPLICATION_PROD_MYSQL }}" > src/main/resources/mysql/application-prod-mysql.yml
           echo -e "${{ secrets.APPLICATION_TEST_MYSQL }}" > src/main/resources/mysql/application-test-mysql.yml
+          echo -e "${{ secrets.APPLICATION_LOCAL_OAUTH }}" > src/main/resources/oauth/application-local-oauth.yml
+          echo -e "${{ secrets.APPLICATION_PROD_OAUTH }}" > src/main/resources/oauth/application-prod-oauth.yml
+          echo -e "${{ secrets.APPLICATION_TEST_OAUTH }}" > src/main/resources/oauth/application-test-oauth.yml
           ls -al src/main/resources
 
       - name: Grant execute permission for gradlew

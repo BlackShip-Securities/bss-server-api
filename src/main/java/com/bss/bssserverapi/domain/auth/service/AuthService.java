@@ -1,10 +1,14 @@
 package com.bss.bssserverapi.domain.auth.service;
 
-import com.bss.bssserverapi.domain.auth.dto.*;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.*;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
 import com.bss.bssserverapi.domain.auth.utils.CookieProvider;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
+import com.bss.bssserverapi.domain.user.RoleType;
 import com.bss.bssserverapi.domain.user.User;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
 import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
@@ -26,18 +30,45 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     @Transactional
+    public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto, final String guestUserName){
+
+        User user = userJpaRepository.findByUserName(guestUserName)
+                .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
+
+        if(userJpaRepository.existsByUserName(signupUserReqDto.getUserName())){
+
+            throw new GlobalException(HttpStatus.CONFLICT, ErrorCode.USER_ALREADY_EXISTS);
+        }
+
+        if(!signupUserReqDto.getPassword().equals(signupUserReqDto.getPasswordConfirmation())){
+
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_AND_CONFIRMATION_MISMATCH);
+        }
+
+        user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.ROLE_USER);
+
+        return SignupUserResDto.builder()
+                .userName(userJpaRepository.save(user).getUserName())
+                .build();
+    }
+
+    @Transactional
     public LoginUserResWithCookieDto login(final LoginUserReqDto loginUserReqDto){
 
         User user = userJpaRepository.findByUserName(loginUserReqDto.getUserName())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
-        if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
+        if(user.getRoleType() == RoleType.ROLE_GUEST) {
 
+            throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.SIGNUP_NOT_COMPLETED);
+        }
+
+        if(!bCryptPasswordEncoder.matches(loginUserReqDto.getPassword(), user.getPassword())){
             throw new GlobalException(HttpStatus.UNAUTHORIZED, ErrorCode.PASSWORD_MISMATCH);
         }
 
-        String accessToken = jwtProvider.createAccessToken(user.getUserName());
-        String refreshToken = jwtProvider.createRefreshToken(user.getUserName());
+        String accessToken = jwtProvider.createAccessToken(user.getUserName(), user.getRoleType().name());
+        String refreshToken = jwtProvider.createRefreshToken(user.getUserName(), user.getRoleType().name());
 
         authRepository.deleteByUserName(user.getUserName());
         authRepository.save(user.getUserName(), refreshToken, jwtProvider.getExpiredDate(refreshToken));
@@ -62,8 +93,9 @@ public class AuthService {
         jwtProvider.validateToken(refreshToken);
 
         String userName = jwtProvider.getUserName(refreshToken);
-        String accessToken = jwtProvider.createAccessToken(userName);
-        String newRefreshToken = jwtProvider.createRefreshToken(userName);
+        String role = jwtProvider.getRole(refreshToken);
+        String accessToken = jwtProvider.createAccessToken(userName, role);
+        String newRefreshToken = jwtProvider.createRefreshToken(userName, role);
 
         authRepository.deleteByUserName(userName);
         authRepository.save(userName, newRefreshToken, jwtProvider.getExpiredDate(newRefreshToken));

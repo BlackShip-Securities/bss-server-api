@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.auth.dto;
+package com.bss.bssserverapi.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginUserReqDto {
 
     @NotNull

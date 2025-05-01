@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
         AND c.parentComment IS NULL
         """
     )
-    Page<Long> findCommentIdPagingByResearchId(final Long researchId, final Pageable pageable);
+    Page<Long> findCommentIdPagingByResearchId(@Param("researchId") final Long researchId, final Pageable pageable);
 
     @Query("""
         SELECT c FROM Comment c
@@ -29,7 +30,7 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
         WHERE c.id IN :commentIds
         ORDER BY c.id DESC
     """)
-    List<Comment> findCommentsWithUserByIdIn(final List<Long> commentIds);
+    List<Comment> findCommentsWithUserByIdIn(@Param("commentIds") final List<Long> commentIds);
 
     @Query("""
         SELECT c FROM Comment c 
@@ -37,5 +38,5 @@ public interface CommentJpaRepository extends JpaRepository<Comment, Long> {
         WHERE c.parentComment.id = :parentCommentId 
         ORDER BY c.id DESC
     """)
-    List<Comment> findCommentsByParentCommentId(final Long parentCommentId);
+    List<Comment> findCommentsByParentCommentId(@Param("parentCommentId") final Long parentCommentId);
 }

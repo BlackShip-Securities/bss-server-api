@@ -1,6 +1,6 @@
 package com.bss.bssserverapi.domain.research;
 
-import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
+import com.bss.bssserverapi.domain.research.dto.req.CreateResearchReqDto;
 import com.bss.bssserverapi.domain.stock.Stock;
 import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.global.common.DateTimeField;

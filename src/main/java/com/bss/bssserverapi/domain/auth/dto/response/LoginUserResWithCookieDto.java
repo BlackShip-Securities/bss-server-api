@@ -1,13 +1,10 @@
-package com.bss.bssserverapi.domain.auth.dto;
+package com.bss.bssserverapi.domain.auth.dto.response;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseCookie;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class LoginUserResWithCookieDto {
 
     private ResponseCookie cookie;

@@ -1,10 +1,12 @@
 package com.bss.bssserverapi.domain.auth.controller;
 
-import com.bss.bssserverapi.domain.auth.dto.LoginUserReqDto;
-import com.bss.bssserverapi.domain.auth.dto.LoginUserResDto;
-import com.bss.bssserverapi.domain.auth.dto.LoginUserResWithCookieDto;
-import com.bss.bssserverapi.domain.auth.dto.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
+import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
+import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +21,15 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PatchMapping("/signup")
+    public ResponseEntity<SignupUserResDto> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto,
+                                                       @AuthenticationPrincipal final String guestUserName){
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(authService.signupUser(signupUserReqDto, guestUserName));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<LoginUserResDto> login(@Valid @RequestBody final LoginUserReqDto loginUserReqDto){
@@ -43,11 +54,11 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal final String userId) {
+    public ResponseEntity<?> logout(@AuthenticationPrincipal final String userName) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, authService.logout(userId).getCookie().toString())
+                .header(HttpHeaders.SET_COOKIE, authService.logout(userName).getCookie().toString())
                 .body("");
     }
 

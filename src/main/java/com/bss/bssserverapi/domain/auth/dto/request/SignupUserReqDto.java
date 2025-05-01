@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.domain.user.dto;
+package com.bss.bssserverapi.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

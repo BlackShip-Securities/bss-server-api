@@ -1,12 +1,11 @@
-package com.bss.bssserverapi.domain.user.dto;
+package com.bss.bssserverapi.domain.auth.dto.response;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor
 public class SignupUserResDto {
 
     private String userName;

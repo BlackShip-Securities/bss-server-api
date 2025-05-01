@@ -1,7 +1,7 @@
 package com.bss.bssserverapi.fixture;
 
 import com.bss.bssserverapi.domain.research.Research;
-import com.bss.bssserverapi.domain.research.dto.CreateResearchReqDto;
+import com.bss.bssserverapi.domain.research.dto.req.CreateResearchReqDto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

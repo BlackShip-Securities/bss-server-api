@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.auth.filter.ExceptionHandlerFilter;
 import com.bss.bssserverapi.domain.auth.filter.GlobalAccessDeniedHandler;
 import com.bss.bssserverapi.domain.auth.filter.GlobalAuthenticationEntryPoint;
 import com.bss.bssserverapi.domain.auth.filter.JwtAuthenticationFilter;
+import com.bss.bssserverapi.domain.auth.service.OAuth2Service;
 import com.bss.bssserverapi.domain.auth.utils.JwtProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +16,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -27,15 +30,24 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtProvider jwtProvider;
+    private final OAuth2Service oAuth2Service;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     public SecurityConfig(
             @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfigurationSource,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
-            JwtProvider jwtProvider) {
+            final JwtProvider jwtProvider,
+            final OAuth2Service oAuth2Service,
+            final AuthenticationSuccessHandler authenticationSuccessHandler,
+            final AuthenticationFailureHandler authenticationFailureHandler) {
 
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.corsConfigurationSource = corsConfigurationSource;
         this.jwtProvider = jwtProvider;
+        this.oAuth2Service = oAuth2Service;
+        this.authenticationSuccessHandler = authenticationSuccessHandler;
+        this.authenticationFailureHandler = authenticationFailureHandler;
     }
 
     @Bean
@@ -70,13 +82,22 @@ public class SecurityConfig {
                 )
                 .permitAll()
                 .requestMatchers(
-                        "/api/v1/auth/login", "/api/v1/auth/refresh",
-                        "/api/v1/users/signup"
+                        "/login/oauth2/code/google",
+                        "/api/v1/auth/login", "/api/v1/auth/refresh"
                 )
                 .permitAll()
+                .requestMatchers(
+                        "/api/v1/auth/signup"
+                )
+                .hasRole("GUEST")
                 .anyRequest()
-                .authenticated()
+                .hasRole("USER")
         );
+
+        http.oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig.userService(oAuth2Service))
+                        .successHandler(authenticationSuccessHandler)
+                        .failureHandler(authenticationFailureHandler));
 
         http.exceptionHandling(config -> config
                 .authenticationEntryPoint(new GlobalAuthenticationEntryPoint(handlerExceptionResolver))
@@ -85,12 +106,12 @@ public class SecurityConfig {
 
         http.addFilterBefore(
                 new ExceptionHandlerFilter(handlerExceptionResolver),
-                UsernamePasswordAuthenticationFilter.class
+                OAuth2LoginAuthenticationFilter.class
         );
 
         http.addFilterBefore(
                 new JwtAuthenticationFilter(this.jwtProvider),
-                UsernamePasswordAuthenticationFilter.class
+                OAuth2LoginAuthenticationFilter.class
         );
 
 

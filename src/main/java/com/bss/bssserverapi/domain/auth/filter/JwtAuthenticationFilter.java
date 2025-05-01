@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -41,24 +42,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
 
-        String refreshToken = this.extractRefreshTokenFromHeader(request, response, filterChain);
-        if(!StringUtils.hasText(refreshToken)){
+        String accessToken = this.extractAccessTokenFromHeader(request, response, filterChain);
+        if(!StringUtils.hasText(accessToken)){
 
             return;
         }
 
-        this.validateToken(refreshToken);
+        this.validateToken(accessToken);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                jwtProvider.getUserName(refreshToken),
+                jwtProvider.getUserName(accessToken),
                 null,
-                null);
+                List.of(new SimpleGrantedAuthority(jwtProvider.getRole(accessToken))));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
 
-    private String extractRefreshTokenFromHeader(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException{
+    private String extractAccessTokenFromHeader(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException{
 
         String header = request.getHeader("Authorization");
         if(!StringUtils.hasText(header)){
