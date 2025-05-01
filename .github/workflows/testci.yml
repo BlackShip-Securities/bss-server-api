@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p src/main/resources
           mkdir -p src/main/resources/mysql
+          mkdir -p src/main/resources/oauth
           echo -e "${{ secrets.APPLICATION }}" > src/main/resources/application.yml
           echo -e "${{ secrets.APPLICATION_JWT }}" > src/main/resources/application-jwt.yml
           echo -e "${{ secrets.APPLICATION_LOCAL_MYSQL }}" > src/main/resources/mysql/application-local-mysql.yml
