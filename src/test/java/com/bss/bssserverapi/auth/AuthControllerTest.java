@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.auth;
 
+import com.bss.bssserverapi.auth.support.WithCustomMockUser;
 import com.bss.bssserverapi.domain.auth.controller.AuthController;
 import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
 import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
@@ -59,17 +60,18 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("회원 가입 성공")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
     void createUser_Success() throws Exception {
 
         // given
         SignupUserReqDto req = SignupUserReqDto.builder()
-                .userName("bss_test")
+                .userName("bss_guest")
                 .password("Qq12341234@")
                 .passwordConfirmation("Qq12341234@")
                 .build();
 
         SignupUserResDto res = SignupUserResDto.builder()
-                .userName("bss_test")
+                .userName("bss_guest")
                 .build();
 
         given(authService.signupUser(any(SignupUserReqDto.class), any(String.class))).willReturn(res);
@@ -79,12 +81,13 @@ public class AuthControllerTest {
                 MockMvcRequestBuilders.patch("/api/v1/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.userName").value("bss_test"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userName").value("bss_guest"));
     }
 
     @Test
     @DisplayName("회원 가입 실패 - 필수 필드 누락")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
     void createUser_Fail_MissingFields() throws Exception {
 
         // given
@@ -98,13 +101,14 @@ public class AuthControllerTest {
                         MockMvcRequestBuilders.patch("/api/v1/auth/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError())
                 // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().string(not(isEmptyOrNullString())));
     }
 
     @Test
     @DisplayName("회원 가입 실패 - 옳바르지 못한 필드 값")
+    @WithCustomMockUser(userName = "socialType+socialId", role = "ROLE_GUEST")
     void createUser_Fail_InvalidFieldValues() throws Exception {
 
         // given
@@ -119,8 +123,8 @@ public class AuthControllerTest {
                         MockMvcRequestBuilders.patch("/api/v1/auth/signup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isInternalServerError())
                 // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().string(not(isEmptyOrNullString())));
     }
 
@@ -169,7 +173,6 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.code").value(ErrorCode.UNAUTHENTICATED.getCode()))
                 .andExpect(jsonPath("$.message").value(ErrorCode.UNAUTHENTICATED.getMessage()));
     }
-
 
     @Test
     @DisplayName("액세스 토큰 검증 실패 - 만료 시간")

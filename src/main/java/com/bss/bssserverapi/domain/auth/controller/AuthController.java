@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
 import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResDto;
 import com.bss.bssserverapi.domain.auth.dto.response.LoginUserResWithCookieDto;
 import com.bss.bssserverapi.domain.auth.dto.response.RefreshTokenResWithCookieDto;
+import com.bss.bssserverapi.domain.auth.dto.response.SignupUserResDto;
 import com.bss.bssserverapi.domain.auth.service.AuthService;
 import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import jakarta.validation.Valid;
@@ -22,11 +23,11 @@ public class AuthController {
     private final AuthService authService;
 
     @PatchMapping("/signup")
-    public ResponseEntity<?> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto,
-                                        @AuthenticationPrincipal final String guestUserName){
+    public ResponseEntity<SignupUserResDto> signupUser(@RequestBody @Valid final SignupUserReqDto signupUserReqDto,
+                                                       @AuthenticationPrincipal final String guestUserName){
 
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(HttpStatus.OK)
                 .body(authService.signupUser(signupUserReqDto, guestUserName));
     }
 
