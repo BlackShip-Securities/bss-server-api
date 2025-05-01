@@ -15,6 +15,7 @@ import com.bss.bssserverapi.global.config.SecurityConfig;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +130,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("인증(로그인) 성공")
+    @DisplayName("로그인 성공")
     void login_Success() throws Exception {
 
         // given
@@ -161,8 +162,29 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("인가 실패 - 액세스 토큰 없음")
-    void authorization_Fail_NoAccessToken() throws Exception {
+    @DisplayName("로그아웃 성공")
+    @WithCustomMockUser(userName = "bss_user", role = "ROLE_USER")
+    void logout_Success() throws Exception {
+
+        // given
+        given(authService.logout(anyString()))
+                .willReturn(LogoutUserResDto.builder()
+                        .cookie(CookieProvider.deleteResponseCookie())
+                        .build());
+
+        // when & then
+        mockMvc.perform(
+                        MockMvcRequestBuilders.delete("/api/v1/auth/logout")
+                                .contentType(MediaType.APPLICATION_JSON))
+                // TODO: GlobalException 정책 변경하고 matcher 수정
+                .andExpect(status().isOk())
+                .andExpect(content().string(""))
+                .andExpect(header().string(HttpHeaders.SET_COOKIE, Matchers.containsString("refresh_token=;")));
+    }
+
+    @Test
+    @DisplayName("인증 실패 - 액세스 토큰 없음")
+    void authentication_Fail_NoAccessToken() throws Exception {
 
         // when & then
         mockMvc.perform(
