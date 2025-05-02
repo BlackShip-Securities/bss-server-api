@@ -85,11 +85,8 @@ public class CommentService {
     public GetCommentPagingResDto getCommentPagingByResearch(final Long researchId, final int page, final int limit){
 
         Pageable pageable = PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, "id"));
-        System.out.println("pageable = " + pageable);
         Page<Long> commentIdPage = commentJpaRepository.findCommentIdPagingByResearchId(researchId, pageable);
-        System.out.println("commentIdPage = " + commentIdPage);
         List<Long> commentIdList = commentIdPage.getContent();
-        System.out.println("commentIdList = " + commentIdList);
 
         List<Comment> commentList = commentJpaRepository.findCommentsWithUserByIdIn(commentIdList);
 

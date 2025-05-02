@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class CreateCommentReqDto {
 
     @NotBlank
