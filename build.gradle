@@ -40,6 +40,9 @@ dependencies {
     // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    // redis
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.4'
+
     // mysql driver
     runtimeOnly 'com.mysql:mysql-connector-j'
 

@@ -83,7 +83,8 @@ public class SecurityConfig {
                 .permitAll()
                 .requestMatchers(
                         "/login/oauth2/code/google",
-                        "/api/v1/auth/login", "/api/v1/auth/refresh"
+                        "/api/v1/auth/login", "/api/v1/auth/refresh",
+                        "/ws/**", "/topic/**"
                 )
                 .permitAll()
                 .requestMatchers(

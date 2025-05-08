@@ -4,6 +4,7 @@ import com.bss.bssserverapi.global.websocket.dto.TickerMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,11 +15,14 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
     private final Runnable reconnect;
+    private final RedissonClient redissonClient;
 
-    public BinanceWebSocketHandler(final ObjectMapper objectMapper, final Runnable reconnect) {
+
+    public BinanceWebSocketHandler(final ObjectMapper objectMapper, final Runnable reconnect, final RedissonClient redissonClient) {
 
         this.objectMapper = objectMapper;
         this.reconnect = reconnect;
+        this.redissonClient = redissonClient;
     }
 
     @Override
@@ -31,11 +35,15 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
 
         try {
-            JsonNode root = objectMapper.readTree(message.getPayload());
+            JsonNode root = this.objectMapper.readTree(message.getPayload());
 
             if (root.has("data")){
                 JsonNode data = root.get("data");
-                TickerMessage tickerMessage = objectMapper.treeToValue(data, TickerMessage.class);
+                TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
+
+                this.redissonClient.getTopic("crypto/" + tickerMessage.getSymbol())
+                        .publish(tickerMessage);
+
                 // 원하는 데이터만 출력
                 log.info("[Binance] {} | Last: {} | High: {} | Low: {} | Volume: {}",
                         tickerMessage.getSymbol(),

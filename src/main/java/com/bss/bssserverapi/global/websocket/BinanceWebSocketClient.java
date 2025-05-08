@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.Redisson;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.redisson.api.RedissonClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,29 +25,29 @@ import java.util.List;
 public class BinanceWebSocketClient {
 
     private static final String BASE_BINANCE_WS_URL = "wss://stream.binance.com:9443/stream?streams=";
-    private WebSocketClient client;
-    private WebSocketSession session;
-    private BinanceWebSocketHandler handler;
+    private WebSocketClient webSocketClient;
+    private WebSocketSession webSocketSession;
+    private BinanceWebSocketHandler webSocketHandler;
 
     private final ObjectMapper objectMapper;
-//    private final List<String> symbols = List.of("btcusdt", "ethusdt", "soluusdt");
+    private final RedissonClient redissonClient;
     private final List<String> symbols = List.of("btcusdt", "ethusdt");
 
     @PostConstruct
     public void init() {
 
-        this.handler = new BinanceWebSocketHandler(objectMapper, this::reconnect);
+        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void connect() {
 
         try {
-            client = new StandardWebSocketClient();
+            this.webSocketClient = new StandardWebSocketClient();
             String streamPath = String.join("/", symbols.stream().map(s -> s + "@ticker").toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
 
-            session = client.doHandshake(handler, new WebSocketHttpHeaders(), URI.create(url)).get();
+            this.webSocketSession = this.webSocketClient.doHandshake(this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
             log.info("Connected to Binance WebSocket: {}", url);
         } catch (Exception e) {
             log.error("Binance WebSocket connection failed", e);
@@ -68,10 +70,10 @@ public class BinanceWebSocketClient {
     @PreDestroy
     public void disconnect() {
 
-        if(session != null && session.isOpen()){
+        if(this.webSocketSession != null && this.webSocketSession.isOpen()){
             try {
                 log.info("Disconnected to Binance WebSocket: {}", BASE_BINANCE_WS_URL);
-                session.close();
+                this.webSocketSession.close();
             } catch (IOException e) {
                 log.error("Error closing websocket", e);
             }
