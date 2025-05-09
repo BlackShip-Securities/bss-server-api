@@ -22,7 +22,7 @@ public class RedisPriceListener {
     public void register() {
         List<String> symbols = List.of("btcusdt", "ethusdt");
         for(String symbol : symbols) {
-            String topic = "crypto/" + symbol;
+            String topic = "crypto/price/" + symbol;
             redissonClient.getTopic(topic)
                     .addListener(TickerMessage.class, (channel, message) ->  {
                         messagingTemplate.convertAndSend("/topic/crypto/price/" + symbol, message);

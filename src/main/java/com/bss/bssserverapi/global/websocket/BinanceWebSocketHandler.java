@@ -41,7 +41,7 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
                 JsonNode data = root.get("data");
                 TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
 
-                this.redissonClient.getTopic("crypto/" + tickerMessage.getSymbol())
+                this.redissonClient.getTopic("crypto/price/" + tickerMessage.getSymbol().toLowerCase())
                         .publish(tickerMessage);
 
                 // 원하는 데이터만 출력
