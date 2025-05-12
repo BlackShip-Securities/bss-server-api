@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket;
+package com.bss.bssserverapi.global.websocket.client;
 
 import com.bss.bssserverapi.global.websocket.dto.KlineMessage;
 import com.bss.bssserverapi.global.websocket.dto.TickerMessage;

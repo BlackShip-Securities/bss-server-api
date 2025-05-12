@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket;
+package com.bss.bssserverapi.global.websocket.server;
 
 import com.bss.bssserverapi.global.websocket.dto.TickerMessage;
 import jakarta.annotation.PostConstruct;

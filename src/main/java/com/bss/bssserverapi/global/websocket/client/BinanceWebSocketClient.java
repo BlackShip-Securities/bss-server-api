@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket;
+package com.bss.bssserverapi.global.websocket.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
