@@ -1,6 +1,8 @@
 package com.bss.bssserverapi.global.websocket;
 
+import com.bss.bssserverapi.global.websocket.dto.KlineMessage;
 import com.bss.bssserverapi.global.websocket.dto.TickerMessage;
+import com.bss.bssserverapi.global.websocket.dto.TradeMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,19 +41,37 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 
             if (root.has("data")){
                 JsonNode data = root.get("data");
-                TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
+                String eventType = data.get("e").asText();
 
-                this.redissonClient.getTopic("crypto/price/" + tickerMessage.getSymbol().toLowerCase())
-                        .publish(tickerMessage);
-
-                // 원하는 데이터만 출력
-                log.info("[Binance] {} | Last: {} | High: {} | Low: {} | Volume: {}",
-                        tickerMessage.getSymbol(),
-                        tickerMessage.getLastPrice(),
-                        tickerMessage.getHighPrice(),
-                        tickerMessage.getLowPrice(),
-                        tickerMessage.getVolumeBase()
-                );
+                if(eventType.equals("24hrTicker")) {
+                    TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
+                    this.redissonClient.getTopic("crypto/price/" + tickerMessage.getSymbol().toLowerCase())
+                            .publish(tickerMessage);
+//                    log.info("[Binance - 24hrTicker] {} | Last: {} | High: {} | Low: {} | Volume: {}",
+//                            tickerMessage.getSymbol(),
+//                            tickerMessage.getLastPrice(),
+//                            tickerMessage.getHighPrice(),
+//                            tickerMessage.getLowPrice(),
+//                            tickerMessage.getVolumeBase());
+                } else if(eventType.equals("kline")) {
+                    KlineMessage klineMessage = this.objectMapper.treeToValue(data, KlineMessage.class);
+//                    log.info("[Binance - kline] {} | o:{} h:{} l:{} c:{} x:{}",
+//                            klineMessage.getSymbol(),
+//                            klineMessage.getKline().getOpenPrice(),
+//                            klineMessage.getKline().getHighPrice(),
+//                            klineMessage.getKline().getLowPrice(),
+//                            klineMessage.getKline().getClosePrice(),
+//                            klineMessage.getKline().isClosed()
+//                    );
+                } else if (eventType.equals("trade")) {
+                    TradeMessage tradeMessage = this.objectMapper.treeToValue(data, TradeMessage.class);
+//                    log.info("[Binance - trade] {} | price:{} qty:{} time:{} marketMaker:{}",
+//                            tradeMessage.getSymbol(),
+//                            tradeMessage.getPrice(),
+//                            tradeMessage.getQuantity(),
+//                            tradeMessage.getTradeTime(),
+//                            tradeMessage.isBuyerMarketMaker());
+                }
             }
         } catch (Exception e) {
             log.error("[Binance] Error parsing ticker message", e);

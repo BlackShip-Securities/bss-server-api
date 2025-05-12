@@ -5,7 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,6 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.redisson.api.RedissonClient;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,10 +43,12 @@ public class BinanceWebSocketClient {
 
         try {
             this.webSocketClient = new StandardWebSocketClient();
-            String streamPath = String.join("/", symbols.stream().map(s -> s + "@ticker").toList());
+            String streamPath = String.join("/", symbols.stream()
+                    .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade").stream()).toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
 
-            this.webSocketSession = this.webSocketClient.doHandshake(this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
+            this.webSocketSession = this.webSocketClient.doHandshake
+                    (this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
             log.info("Connected to Binance WebSocket: {}", url);
         } catch (Exception e) {
             log.error("Binance WebSocket connection failed", e);
