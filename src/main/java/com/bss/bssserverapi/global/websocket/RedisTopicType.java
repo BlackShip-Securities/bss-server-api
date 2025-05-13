@@ -17,7 +17,6 @@ public enum RedisTopicType {
     TICKER("24hrTicker", "crypto/ticker/", TickerMessage.class),
     TRADE("trade", "crypto/trade/", TradeMessage.class);
 
-
     private final String streamName;
     private final String redisPrefix;
     private final Class<?> messageType;
