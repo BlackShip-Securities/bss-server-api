@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class KlineMessage {
+public class KlineMessage implements BinanceMessage{
 
     @JsonProperty("e")
     private String eventType;

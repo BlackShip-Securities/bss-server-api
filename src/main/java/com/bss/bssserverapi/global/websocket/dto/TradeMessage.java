@@ -6,16 +6,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TradeMessage {
+public class TradeMessage implements BinanceMessage{
 
     @JsonProperty("e")
     private String eventType;
 
-    @JsonProperty("E")
-    private Long eventTime;
-
     @JsonProperty("s")
     private String symbol;
+
+    @JsonProperty("E")
+    private Long eventTime;
 
     @JsonProperty("t")
     private Long tradeId;

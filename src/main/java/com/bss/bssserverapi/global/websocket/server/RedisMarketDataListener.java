@@ -1,6 +1,6 @@
 package com.bss.bssserverapi.global.websocket.server;
 
-import com.bss.bssserverapi.global.websocket.dto.RedisTopicType;
+import com.bss.bssserverapi.global.websocket.RedisTopicType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,10 @@ public class RedisMarketDataListener {
 
         for(RedisTopicType type : RedisTopicType.values()) {
             for(String symbol : symbols) {
-                redissonClient.getTopic(type.getRedisPrefix() + symbol)
+                String redisTopic = type.getRedisPrefix() + symbol;
+                redissonClient.getTopic(redisTopic)
                         .addListener(Object.class, (channel, message) ->  {
-                            messagingTemplate.convertAndSend(type.getWsPrefix() + symbol, message);
+                            messagingTemplate.convertAndSend("/topic/" + redisTopic, message);
                         });
             }
         }

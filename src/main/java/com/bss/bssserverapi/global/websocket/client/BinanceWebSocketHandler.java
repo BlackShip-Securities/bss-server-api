@@ -1,9 +1,7 @@
 package com.bss.bssserverapi.global.websocket.client;
 
-import com.bss.bssserverapi.global.websocket.dto.KlineMessage;
-import com.bss.bssserverapi.global.websocket.dto.RedisTopicType;
-import com.bss.bssserverapi.global.websocket.dto.TickerMessage;
-import com.bss.bssserverapi.global.websocket.dto.TradeMessage;
+import com.bss.bssserverapi.global.websocket.RedisTopicType;
+import com.bss.bssserverapi.global.websocket.dto.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -31,63 +29,45 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
 
-        log.info("Binance WebSocket connection established");
+        log.info("[Binance] WebSocket connection established");
     }
 
     @Override
     protected void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
 
         try {
-            JsonNode root = this.objectMapper.readTree(message.getPayload());
-
-            if (root.has("data")){
-                JsonNode data = root.get("data");
-                String eventType = data.get("e").asText();
-
-                switch (eventType) {
-                    case "24hrTicker" -> {
-                        TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
-                        this.redissonClient.getTopic(RedisTopicType.TICKER.getRedisPrefix() + tickerMessage.getSymbol().toLowerCase())
-                                .publish(tickerMessage);
-//                    log.info("[Binance - 24hrTicker] {} | Last: {} | High: {} | Low: {} | Volume: {}",
-//                            tickerMessage.getSymbol(),
-//                            tickerMessage.getLastPrice(),
-//                            tickerMessage.getHighPrice(),
-//                            tickerMessage.getLowPrice(),
-//                            tickerMessage.getVolumeBase());
-                    }
-                    case "kline" -> {
-                        KlineMessage klineMessage = this.objectMapper.treeToValue(data, KlineMessage.class);
-//                    log.info("[Binance - kline] {} | o:{} h:{} l:{} c:{} x:{}",
-//                            klineMessage.getSymbol(),
-//                            klineMessage.getKline().getOpenPrice(),
-//                            klineMessage.getKline().getHighPrice(),
-//                            klineMessage.getKline().getLowPrice(),
-//                            klineMessage.getKline().getClosePrice(),
-//                            klineMessage.getKline().isClosed()
-//                    );
-                    }
-                    case "trade" -> {
-                        TradeMessage tradeMessage = this.objectMapper.treeToValue(data, TradeMessage.class);
-//                    log.info("[Binance - trade] {} | price:{} qty:{} time:{} marketMaker:{}",
-//                            tradeMessage.getSymbol(),
-//                            tradeMessage.getPrice(),
-//                            tradeMessage.getQuantity(),
-//                            tradeMessage.getTradeTime(),
-//                            tradeMessage.isBuyerMarketMaker());
-                    }
-                }
-            }
+            this.processMessage(message.getPayload());
+        } catch (IllegalArgumentException e){
+//            log.error("[Binance] Error unsupported event type", e);
+//            reconnect.run();
         } catch (Exception e) {
-            log.error("[Binance] Error parsing ticker message", e);
-            reconnect.run();
+//            log.error("[Binance] Error parsing message", e);
+//            reconnect.run();
         }
+    }
+
+    private void processMessage(final String payload) throws Exception{
+
+        JsonNode root = this.objectMapper.readTree(payload);
+        if(!root.has("data"))
+            return;
+
+        JsonNode data = root.get("data");
+        String eventType = data.get("e").asText();
+
+        RedisTopicType topicType = RedisTopicType.fromStreamName(eventType)
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported event type: " + eventType));
+
+        BinanceMessage binanceMessage = (BinanceMessage) this.objectMapper.treeToValue(data, topicType.getMessageType());
+
+        String redisTopic = topicType.getRedisPrefix() + binanceMessage.getSymbol().toLowerCase();
+        this.redissonClient.getTopic(redisTopic).publish(binanceMessage);
     }
 
     @Override
     public void handleTransportError(final WebSocketSession session, final Throwable exception) throws Exception {
 
-        log.error("Transport error", exception);
+        log.error("[Binance] Transport error", exception);
         // TODO: afterConnectionClosed와 중복되지 않도록
 //        reconnect.run();
     }
@@ -95,7 +75,7 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status) throws Exception {
 
-        log.info("Connection closed: {}", status);
+        log.info("[Binance] Connection closed: {}", status);
         // TODO: status에 따라 분기
 //        reconnect.run();
     }
