@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.global.websocket.client;
 
 import com.bss.bssserverapi.global.websocket.dto.KlineMessage;
+import com.bss.bssserverapi.global.websocket.dto.RedisTopicType;
 import com.bss.bssserverapi.global.websocket.dto.TickerMessage;
 import com.bss.bssserverapi.global.websocket.dto.TradeMessage;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,7 +46,7 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 
                 if(eventType.equals("24hrTicker")) {
                     TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
-                    this.redissonClient.getTopic("crypto/price/" + tickerMessage.getSymbol().toLowerCase())
+                    this.redissonClient.getTopic(RedisTopicType.TICKER.getRedisPrefix() + tickerMessage.getSymbol().toLowerCase())
                             .publish(tickerMessage);
 //                    log.info("[Binance - 24hrTicker] {} | Last: {} | High: {} | Low: {} | Volume: {}",
 //                            tickerMessage.getSymbol(),
