@@ -44,18 +44,20 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
                 JsonNode data = root.get("data");
                 String eventType = data.get("e").asText();
 
-                if(eventType.equals("24hrTicker")) {
-                    TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
-                    this.redissonClient.getTopic(RedisTopicType.TICKER.getRedisPrefix() + tickerMessage.getSymbol().toLowerCase())
-                            .publish(tickerMessage);
+                switch (eventType) {
+                    case "24hrTicker" -> {
+                        TickerMessage tickerMessage = this.objectMapper.treeToValue(data, TickerMessage.class);
+                        this.redissonClient.getTopic(RedisTopicType.TICKER.getRedisPrefix() + tickerMessage.getSymbol().toLowerCase())
+                                .publish(tickerMessage);
 //                    log.info("[Binance - 24hrTicker] {} | Last: {} | High: {} | Low: {} | Volume: {}",
 //                            tickerMessage.getSymbol(),
 //                            tickerMessage.getLastPrice(),
 //                            tickerMessage.getHighPrice(),
 //                            tickerMessage.getLowPrice(),
 //                            tickerMessage.getVolumeBase());
-                } else if(eventType.equals("kline")) {
-                    KlineMessage klineMessage = this.objectMapper.treeToValue(data, KlineMessage.class);
+                    }
+                    case "kline" -> {
+                        KlineMessage klineMessage = this.objectMapper.treeToValue(data, KlineMessage.class);
 //                    log.info("[Binance - kline] {} | o:{} h:{} l:{} c:{} x:{}",
 //                            klineMessage.getSymbol(),
 //                            klineMessage.getKline().getOpenPrice(),
@@ -64,14 +66,16 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 //                            klineMessage.getKline().getClosePrice(),
 //                            klineMessage.getKline().isClosed()
 //                    );
-                } else if (eventType.equals("trade")) {
-                    TradeMessage tradeMessage = this.objectMapper.treeToValue(data, TradeMessage.class);
+                    }
+                    case "trade" -> {
+                        TradeMessage tradeMessage = this.objectMapper.treeToValue(data, TradeMessage.class);
 //                    log.info("[Binance - trade] {} | price:{} qty:{} time:{} marketMaker:{}",
 //                            tradeMessage.getSymbol(),
 //                            tradeMessage.getPrice(),
 //                            tradeMessage.getQuantity(),
 //                            tradeMessage.getTradeTime(),
 //                            tradeMessage.isBuyerMarketMaker());
+                    }
                 }
             }
         } catch (Exception e) {
