@@ -1,7 +1,8 @@
-package com.bss.bssserverapi.global.websocket.client;
+package com.bss.bssserverapi.global.websocket.binance.client;
 
-import com.bss.bssserverapi.global.websocket.RedisTopicType;
-import com.bss.bssserverapi.global.websocket.dto.*;
+import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
+import com.bss.bssserverapi.global.websocket.binance.dto.BinanceMessage;
+import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispatcher;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +18,14 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
     private final Runnable reconnect;
     private final RedissonClient redissonClient;
+    private final BinanceMessageDispatcher dispatcher;
 
-
-    public BinanceWebSocketHandler(final ObjectMapper objectMapper, final Runnable reconnect, final RedissonClient redissonClient) {
+    public BinanceWebSocketHandler(final ObjectMapper objectMapper, final Runnable reconnect, final RedissonClient redissonClient, final BinanceMessageDispatcher dispatcher) {
 
         this.objectMapper = objectMapper;
         this.reconnect = reconnect;
         this.redissonClient = redissonClient;
+        this.dispatcher = dispatcher;
     }
 
     @Override
@@ -55,11 +57,15 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
         JsonNode data = root.get("data");
         String eventType = data.get("e").asText();
 
-        RedisTopicType topicType = RedisTopicType.fromStreamName(eventType)
+        BinanceRedisTopicType topicType = BinanceRedisTopicType.fromStreamName(eventType)
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported event type: " + eventType));
 
         BinanceMessage binanceMessage = (BinanceMessage) this.objectMapper.treeToValue(data, topicType.getMessageType());
 
+        // DB or Redis save
+        this.dispatcher.dispatch(binanceMessage);
+
+        // redis publish
         String redisTopic = topicType.getRedisPrefix() + binanceMessage.getSymbol().toLowerCase();
         this.redissonClient.getTopic(redisTopic).publish(binanceMessage);
     }

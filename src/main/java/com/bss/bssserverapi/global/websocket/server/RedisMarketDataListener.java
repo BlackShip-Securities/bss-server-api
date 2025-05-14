@@ -1,6 +1,6 @@
 package com.bss.bssserverapi.global.websocket.server;
 
-import com.bss.bssserverapi.global.websocket.RedisTopicType;
+import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class RedisMarketDataListener {
 
         List<String> symbols = List.of("btcusdt", "ethusdt");
 
-        for(RedisTopicType type : RedisTopicType.values()) {
+        for(BinanceRedisTopicType type : BinanceRedisTopicType.values()) {
             for(String symbol : symbols) {
                 String redisTopic = type.getRedisPrefix() + symbol;
                 redissonClient.getTopic(redisTopic)

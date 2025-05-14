@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket.dto;
+package com.bss.bssserverapi.global.websocket.binance.dto;
 
 public interface BinanceMessage {
 

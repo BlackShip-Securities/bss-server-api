@@ -1,5 +1,6 @@
-package com.bss.bssserverapi.global.websocket.client;
+package com.bss.bssserverapi.global.websocket.binance.client;
 
+import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -31,11 +32,12 @@ public class BinanceWebSocketClient {
     private final ObjectMapper objectMapper;
     private final RedissonClient redissonClient;
     private final List<String> symbols = List.of("btcusdt", "ethusdt");
+    private final BinanceMessageDispatcher dispatcher;
 
     @PostConstruct
     public void init() {
 
-        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient);
+        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient, this.dispatcher);
     }
 
     @EventListener(ApplicationReadyEvent.class)
