@@ -13,9 +13,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public enum BinanceRedisTopicType {
 
-    KLINE("kline", "crypto/kline/", BinanceKlineMessage.class);
-//    TICKER("24hrTicker", "crypto/ticker/", BinanceTickerMessage.class),
-//    TRADE("trade", "crypto/trade/", BinanceTradeMessage.class);
+    KLINE("kline", "crypto/kline/", BinanceKlineMessage.class),
+    TICKER("24hrTicker", "crypto/ticker/", BinanceTickerMessage.class),
+    TRADE("trade", "crypto/trade/", BinanceTradeMessage.class);
 
     private final String streamName;
     private final String redisPrefix;
