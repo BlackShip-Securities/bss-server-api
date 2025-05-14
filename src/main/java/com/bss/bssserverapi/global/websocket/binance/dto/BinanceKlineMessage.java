@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket.dto;
+package com.bss.bssserverapi.global.websocket.binance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class KlineMessage {
+public class BinanceKlineMessage implements BinanceMessage{
 
     @JsonProperty("e")
     private String eventType;
@@ -71,8 +71,5 @@ public class KlineMessage {
 
         @JsonProperty("Q")
         private String takerBuyQuoteVolume;
-
-        @JsonProperty("B")
-        private String ignore;
     }
 }

@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.websocket.dto;
+package com.bss.bssserverapi.global.websocket.binance.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,16 +6,16 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TradeMessage {
+public class BinanceTradeMessage implements BinanceMessage{
 
     @JsonProperty("e")
     private String eventType;
 
-    @JsonProperty("E")
-    private Long eventTime;
-
     @JsonProperty("s")
     private String symbol;
+
+    @JsonProperty("E")
+    private Long eventTime;
 
     @JsonProperty("t")
     private Long tradeId;
