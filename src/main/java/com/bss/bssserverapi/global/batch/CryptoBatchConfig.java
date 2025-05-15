@@ -121,7 +121,6 @@ public class CryptoBatchConfig {
         runCryptoJob();
     }
 
-    @Scheduled(cron = "0 0 */6 * * *") // per 6h
     public void runCryptoJob() throws Exception {
 
         JobParameters params = new JobParametersBuilder()
