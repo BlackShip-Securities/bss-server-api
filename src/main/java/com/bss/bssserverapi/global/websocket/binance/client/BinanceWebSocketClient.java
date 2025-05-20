@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
@@ -33,11 +34,12 @@ public class BinanceWebSocketClient {
     private final RedissonClient redissonClient;
     private final List<String> symbols = List.of("btcusdt", "ethusdt");
     private final BinanceMessageDispatcher dispatcher;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PostConstruct
     public void init() {
 
-        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient, this.dispatcher);
+        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient, this.dispatcher, this.eventPublisher);
     }
 
     @EventListener(ApplicationReadyEvent.class)

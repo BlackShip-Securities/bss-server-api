@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.global.websocket.binance.client;
 
+import com.bss.bssserverapi.global.batch.binance_kline.KlineJobTriggerEvent;
 import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceMessage;
 import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispatcher;
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -19,19 +21,28 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     private final Runnable reconnect;
     private final RedissonClient redissonClient;
     private final BinanceMessageDispatcher dispatcher;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public BinanceWebSocketHandler(final ObjectMapper objectMapper, final Runnable reconnect, final RedissonClient redissonClient, final BinanceMessageDispatcher dispatcher) {
+    public BinanceWebSocketHandler(
+            final ObjectMapper objectMapper,
+            final Runnable reconnect,
+            final RedissonClient redissonClient,
+            final BinanceMessageDispatcher dispatcher,
+            final ApplicationEventPublisher eventPublisher
+    ) {
 
         this.objectMapper = objectMapper;
         this.reconnect = reconnect;
         this.redissonClient = redissonClient;
         this.dispatcher = dispatcher;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
 
         log.info("[Binance] WebSocket connection established");
+        eventPublisher.publishEvent(new KlineJobTriggerEvent(this));
     }
 
     @Override
