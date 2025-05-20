@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.batch;
+package com.bss.bssserverapi.global.batch.binance_crypto;
 
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
