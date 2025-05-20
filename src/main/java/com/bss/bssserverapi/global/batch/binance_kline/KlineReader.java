@@ -12,22 +12,17 @@ import java.util.Queue;
 @Component
 public class KlineReader implements ItemReader<Kline> {
 
-    private final Long LIMIT;
-    private final Long BATCH_END_TIME;
-
     private final BinanceApiService binanceApiService;
-    private final KlineJpaRepository klineJpaRepository;
 
     private final Queue<KlineFetchRequest> requestQueue = new LinkedList<>();
-    private Queue<Kline> buffer = new LinkedList<>();
+    private final Queue<Kline> buffer = new LinkedList<>();
 
     public KlineReader(final BinanceApiService binanceApiService, final KlineJpaRepository klineJpaRepository) throws InterruptedException {
 
-        this.LIMIT = 1000L;
-        this.BATCH_END_TIME = System.currentTimeMillis();
+        final long LIMIT = 1000L;
+        final long BATCH_END_TIME = System.currentTimeMillis();
 
         this.binanceApiService = binanceApiService;
-        this.klineJpaRepository = klineJpaRepository;
 
         List<String> symbols = List.of("BTCUSDT", "ETHUSDT");
         List<String> intervals = List.of("1m", "3m", "5m", "15m", "30m", "1h", "1d", "1w", "1M");
