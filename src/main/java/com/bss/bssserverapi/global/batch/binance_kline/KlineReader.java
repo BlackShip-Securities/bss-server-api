@@ -12,13 +12,19 @@ import java.util.Queue;
 @Component
 public class KlineReader implements ItemReader<Kline> {
 
+    private final Long LIMIT;
+    private final Long BATCH_END_TIME;
+
     private final BinanceApiService binanceApiService;
     private final KlineJpaRepository klineJpaRepository;
 
     private final Queue<KlineFetchRequest> requestQueue = new LinkedList<>();
     private Queue<Kline> buffer = new LinkedList<>();
 
-    public KlineReader(final BinanceApiService binanceApiService, final KlineJpaRepository klineJpaRepository) {
+    public KlineReader(final BinanceApiService binanceApiService, final KlineJpaRepository klineJpaRepository) throws InterruptedException {
+
+        this.LIMIT = 1000L;
+        this.BATCH_END_TIME = System.currentTimeMillis();
 
         this.binanceApiService = binanceApiService;
         this.klineJpaRepository = klineJpaRepository;
@@ -28,8 +34,18 @@ public class KlineReader implements ItemReader<Kline> {
 
         for (String symbol : symbols) {
             for (String interval : intervals) {
-                requestQueue.add(new KlineFetchRequest(symbol, interval));
+                Long intervalMillis = getIntervalMillis(interval);
+                Long startTime = klineJpaRepository.findLatestOpenTime(symbol, interval)
+                        .map(openTime -> openTime + intervalMillis)
+                        .orElse(binanceApiService.fetchEarliestKlineOpenTime(symbol, interval));
+
+                long diff = LIMIT * intervalMillis;
+                for(long t = startTime; t < BATCH_END_TIME; t += diff){
+                    requestQueue.add(new KlineFetchRequest(symbol, interval, t, t + diff - 1));
+                }
             }
+
+            Thread.sleep(1000);
         }
     }
 
@@ -37,27 +53,20 @@ public class KlineReader implements ItemReader<Kline> {
     public Kline read() throws Exception {
 
         while (buffer.isEmpty() && !requestQueue.isEmpty()) {
-            fillBuffer(requestQueue.peek());
-            if (buffer.isEmpty()) requestQueue.poll();
+            fillBuffer(requestQueue.poll());
         }
+
         return buffer.poll();
     }
 
     private void fillBuffer(final KlineFetchRequest request) throws InterruptedException {
-        Long intervalMillis = getIntervalMillis(request.interval());
-        Long startTime = klineJpaRepository.findLatestOpenTime(request.symbol(), request.interval())
-                .map(t -> t + intervalMillis)
-                .orElse(0L);
-        Long endTime = (Long) System.currentTimeMillis();
 
-        if (startTime >= endTime) return;
-
-        List<Kline> klineList = binanceApiService.fetchKlineList(request.symbol(), request.interval(), startTime, 1000L);
+        List<Kline> klineList = binanceApiService.fetchKlineList(request.symbol(), request.interval(), request.startTime(), request.endTime(), 1000L);
         if (klineList.isEmpty()) return;
 
         buffer.addAll(klineList);
 
-        Thread.sleep(2000);
+        Thread.sleep(1000);
     }
 
     private Long getIntervalMillis(final String interval) {
