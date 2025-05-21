@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface KlineJpaRepository extends JpaRepository<Kline, Long> {
 
     @Query("""
-        SELECT MAX(k.openTime) 
+        SELECT MAX(k.openTime)
         FROM Kline k 
         WHERE k.symbol = :symbol 
           AND k.interval = :interval 
