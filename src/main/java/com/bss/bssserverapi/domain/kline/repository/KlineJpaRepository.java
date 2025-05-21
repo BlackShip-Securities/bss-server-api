@@ -13,9 +13,9 @@ public interface KlineJpaRepository extends JpaRepository<Kline, Long> {
 
     @Query("""
         SELECT MAX(k.openTime)
-        FROM Kline k 
-        WHERE k.symbol = :symbol 
-          AND k.interval = :interval 
+        FROM Kline k
+        WHERE k.symbol = :symbol
+          AND k.interval = :interval
           AND k.openTime <= :endTime
     """)
     Optional<Long> findLatestOpenTimeWithinRange(
