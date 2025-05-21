@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.batch;
+package com.bss.bssserverapi.global.batch.crypto;
 
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
@@ -19,6 +19,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +43,7 @@ public class CryptoBatchConfig {
     private Set<String> existingSymbols = new HashSet<>();
 
     @Bean
-    public Job cryptoJob(final Step cryptoStep) {
+    public Job cryptoJob(@Qualifier("cryptoStep") final Step cryptoStep) {
 
         return new JobBuilder("cryptoJob", jobRepository)
                 .start(cryptoStep)
