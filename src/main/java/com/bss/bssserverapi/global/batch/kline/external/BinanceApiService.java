@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.batch.kline.service;
+package com.bss.bssserverapi.global.batch.kline.external;
 
 import com.bss.bssserverapi.domain.kline.Kline;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.bss.bssserverapi.global.batch.kline;
 import com.bss.bssserverapi.domain.kline.Kline;
 import com.bss.bssserverapi.domain.kline.repository.KlineJpaRepository;
 import com.bss.bssserverapi.global.batch.kline.dto.KlineFetchRequest;
-import com.bss.bssserverapi.global.batch.kline.service.BinanceApiService;
+import com.bss.bssserverapi.global.batch.kline.external.BinanceApiService;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.stereotype.Component;
 
