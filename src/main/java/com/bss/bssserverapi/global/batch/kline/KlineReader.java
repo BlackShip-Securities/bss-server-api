@@ -32,12 +32,12 @@ public class KlineReader implements ItemReader<Kline> {
         for (String symbol : symbols) {
             for (String interval : intervals) {
                 Long intervalMillis = getIntervalMillis(interval);
-                Long startTime = klineJpaRepository.findLatestOpenTime(symbol, interval)
+                Long startTime = klineJpaRepository.findLatestOpenTimeWithinRange(symbol, interval, BATCH_END_TIME - 100 * 60 * 1000)
                         .map(openTime -> openTime + intervalMillis)
                         .orElse(binanceApiService.fetchEarliestKlineOpenTime(symbol, interval));
 
                 long diff = LIMIT * intervalMillis;
-                for(long t = startTime; t < BATCH_END_TIME; t += diff){
+                for(long t = startTime; t <= BATCH_END_TIME; t += diff){
                     requestQueue.add(new KlineFetchRequest(symbol, interval, t, t + diff - 1));
                 }
             }
@@ -63,7 +63,7 @@ public class KlineReader implements ItemReader<Kline> {
 
         buffer.addAll(klineList);
 
-        Thread.sleep(1000);
+        Thread.sleep(250);
     }
 
     private Long getIntervalMillis(final String interval) {

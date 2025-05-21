@@ -11,6 +11,16 @@ import java.util.Optional;
 @Repository
 public interface KlineJpaRepository extends JpaRepository<Kline, Long> {
 
-    @Query("SELECT MAX(k.openTime) FROM Kline k WHERE k.symbol = :symbol AND k.interval = :interval")
-    Optional<Long> findLatestOpenTime(@Param("symbol") String symbol, @Param("interval") String interval);
+    @Query("""
+        SELECT MAX(k.openTime) 
+        FROM Kline k 
+        WHERE k.symbol = :symbol 
+          AND k.interval = :interval 
+          AND k.openTime >= :afterOpenTime
+    """)
+    Optional<Long> findLatestOpenTimeWithinRange(
+            @Param("symbol") String symbol,
+            @Param("interval") String interval,
+            @Param("afterOpenTime") Long afterOpenTime
+    );
 }
