@@ -16,11 +16,11 @@ public interface KlineJpaRepository extends JpaRepository<Kline, Long> {
         FROM Kline k 
         WHERE k.symbol = :symbol 
           AND k.interval = :interval 
-          AND k.openTime >= :afterOpenTime
+          AND k.openTime <= :endTime
     """)
     Optional<Long> findLatestOpenTimeWithinRange(
-            @Param("symbol") String symbol,
-            @Param("interval") String interval,
-            @Param("afterOpenTime") Long afterOpenTime
+            @Param("symbol") final String symbol,
+            @Param("interval") final String interval,
+            @Param("endTime") final Long endTime
     );
 }
