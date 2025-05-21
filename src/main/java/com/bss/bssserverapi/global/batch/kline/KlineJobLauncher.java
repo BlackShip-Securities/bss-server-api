@@ -1,6 +1,6 @@
-package com.bss.bssserverapi.global.batch.binance_kline;
+package com.bss.bssserverapi.global.batch.kline;
 
-import lombok.RequiredArgsConstructor;
+import com.bss.bssserverapi.global.batch.kline.event.KlineJobTriggerEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;

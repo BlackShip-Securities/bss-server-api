@@ -1,6 +1,6 @@
 package com.bss.bssserverapi.global.websocket.binance.client;
 
-import com.bss.bssserverapi.global.batch.binance_kline.KlineJobTriggerEvent;
+import com.bss.bssserverapi.global.batch.kline.event.KlineJobTriggerEvent;
 import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceMessage;
 import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispatcher;

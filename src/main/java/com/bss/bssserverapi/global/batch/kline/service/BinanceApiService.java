@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.batch.binance_kline;
+package com.bss.bssserverapi.global.batch.kline.service;
 
 import com.bss.bssserverapi.domain.kline.Kline;
 import lombok.extern.slf4j.Slf4j;

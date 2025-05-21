@@ -1,4 +1,4 @@
-package com.bss.bssserverapi.global.batch.binance_kline;
+package com.bss.bssserverapi.global.batch.kline.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
