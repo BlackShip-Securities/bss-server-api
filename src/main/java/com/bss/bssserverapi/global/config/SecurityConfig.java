@@ -92,7 +92,8 @@ public class SecurityConfig {
                 )
                 .hasRole("GUEST")
                 .anyRequest()
-                .hasRole("USER")
+                .permitAll()
+//                .hasRole("USER")
         );
 
         http.oauth2Login((oauth2) -> oauth2

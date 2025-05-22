@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CryptoJpaRepository extends JpaRepository<Crypto, Long> {
 
@@ -12,4 +13,6 @@ public interface CryptoJpaRepository extends JpaRepository<Crypto, Long> {
 
     @Query("select c.symbol from Crypto c")
     List<String> findAllSymbols();
+
+    Optional<Crypto> findBySymbol(final String symbol);
 }
