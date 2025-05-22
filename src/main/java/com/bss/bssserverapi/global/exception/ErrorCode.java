@@ -28,8 +28,7 @@ public enum ErrorCode {
     RESEARCH_NOT_FOUND("B006", "Research not found"),
     COMMENT_NOT_FOUND("B007", "Comment not found"),
     REPLY_TO_COMMENT_ONLY("B008", "Replies can only be written to comments"),
-
-
+    CRYPTO_NOT_FOUND("B009", "Crypto not found"),
 
     // common
     UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
