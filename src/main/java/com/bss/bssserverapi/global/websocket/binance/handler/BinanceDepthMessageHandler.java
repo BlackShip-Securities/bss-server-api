@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.global.websocket.binance.handler;
 
+import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceDepthMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class BinanceDepthMessageHandler implements BinanceMessageHandler<BinanceDepthMessage> {
 
     @Override
-    public void handle(final BinanceDepthMessage message) {
+    public void handle(final BinanceRedisTopicType topicType, final BinanceDepthMessage message) {
 
         log.info("Binance Depth Update | EventType: {}, EventTime: {}, Symbol: {}, FirstUpdateID: {}, FinalUpdateID: {}",
                 message.getEventType(), message.getEventTime(), message.getSymbol(),

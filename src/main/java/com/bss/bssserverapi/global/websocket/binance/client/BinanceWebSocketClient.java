@@ -33,7 +33,6 @@ public class BinanceWebSocketClient {
     private BinanceWebSocketHandler webSocketHandler;
 
     private final ObjectMapper objectMapper;
-    private final RedissonClient redissonClient;
     private final List<String> symbols = List.of("btcusdt", "ethusdt");
     private final BinanceMessageDispatcher dispatcher;
     private final ApplicationEventPublisher eventPublisher;
@@ -41,7 +40,7 @@ public class BinanceWebSocketClient {
     @PostConstruct
     public void init() {
 
-        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient, this.dispatcher, this.eventPublisher);
+        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.dispatcher, this.eventPublisher);
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -57,8 +56,7 @@ public class BinanceWebSocketClient {
                     .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade", s + "@depth@100ms").stream()).toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
 
-            this.webSocketSession = this.webSocketClient.doHandshake
-                    (this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
+            this.webSocketSession = this.webSocketClient.doHandshake(this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
             log.info("Connected to Binance WebSocket: {}", url);
         } catch (Exception e) {
             log.error("Binance WebSocket connection failed", e);
