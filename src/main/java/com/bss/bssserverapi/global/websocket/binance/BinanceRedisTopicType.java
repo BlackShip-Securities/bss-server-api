@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.global.websocket.binance;
 
+import com.bss.bssserverapi.global.websocket.binance.dto.BinanceDepthMessage;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceKlineMessage;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceTickerMessage;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceTradeMessage;
@@ -15,16 +16,17 @@ public enum BinanceRedisTopicType {
 
     KLINE("kline", "crypto/kline/", BinanceKlineMessage.class),
     TICKER("24hrTicker", "crypto/ticker/", BinanceTickerMessage.class),
-    TRADE("trade", "crypto/trade/", BinanceTradeMessage.class);
+    TRADE("trade", "crypto/trade/", BinanceTradeMessage.class),
+    DEPTH("depthUpdate", "crypto/depth/", BinanceDepthMessage.class);
 
-    private final String streamName;
+    private final String eventType;
     private final String redisPrefix;
     private final Class<?> messageType;
 
-    public static Optional<BinanceRedisTopicType> fromStreamName(final String streamName){
+    public static Optional<BinanceRedisTopicType> fromEventType(final String eventType){
 
         return Arrays.stream(values())
-                .filter(t -> t.streamName.equals(streamName))
+                .filter(t -> t.eventType.equals(eventType))
                 .findFirst();
     }
 }

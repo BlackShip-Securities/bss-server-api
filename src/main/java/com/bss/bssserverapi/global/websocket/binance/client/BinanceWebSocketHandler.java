@@ -42,7 +42,9 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
 
         log.info("[Binance] WebSocket connection established");
-        eventPublisher.publishEvent(new KlineJobTriggerEvent(this));
+
+        // TODO: kline batch
+//        eventPublisher.publishEvent(new KlineJobTriggerEvent(this));
     }
 
     @Override
@@ -68,7 +70,7 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
         JsonNode data = root.get("data");
         String eventType = data.get("e").asText();
 
-        BinanceRedisTopicType topicType = BinanceRedisTopicType.fromStreamName(eventType)
+        BinanceRedisTopicType topicType = BinanceRedisTopicType.fromEventType(eventType)
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported event type: " + eventType));
 
         BinanceMessage binanceMessage = (BinanceMessage) this.objectMapper.treeToValue(data, topicType.getMessageType());
@@ -78,7 +80,7 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 
         // redis publish
         String redisTopic = topicType.getRedisPrefix() + binanceMessage.getSymbol().toLowerCase();
-        this.redissonClient.getTopic(redisTopic).publish(binanceMessage);
+//        this.redissonClient.getTopic(redisTopic).publish(binanceMessage);
     }
 
     @Override
