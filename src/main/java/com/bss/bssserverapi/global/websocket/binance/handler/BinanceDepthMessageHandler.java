@@ -2,29 +2,22 @@ package com.bss.bssserverapi.global.websocket.binance.handler;
 
 import com.bss.bssserverapi.global.websocket.binance.BinanceRedisTopicType;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceDepthMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class BinanceDepthMessageHandler implements BinanceMessageHandler<BinanceDepthMessage> {
+
+    private final RedissonClient redissonClient;
 
     @Override
     public void handle(final BinanceRedisTopicType topicType, final BinanceDepthMessage message) {
 
-        log.info("Binance Depth Update | EventType: {}, EventTime: {}, Symbol: {}, FirstUpdateID: {}, FinalUpdateID: {}",
-                message.getEventType(), message.getEventTime(), message.getSymbol(),
-                message.getFirstUpdateId(), message.getFinalUpdateId());
 
-        log.info("--- Bids ---");
-        message.getBids().forEach(bid ->
-                log.info("Price: {}, Quantity: {}", bid.get(0), bid.get(1))
-        );
-
-        log.info("--- Asks ---");
-        message.getAsks().forEach(ask ->
-                log.info("Price: {}, Quantity: {}", ask.get(0), ask.get(1))
-        );
     }
 
     @Override
