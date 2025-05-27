@@ -3,11 +3,13 @@ package com.bss.bssserverapi.global.websocket.binance.service;
 import com.bss.bssserverapi.global.external.BinanceApiService;
 import com.bss.bssserverapi.global.external.dto.BinanceOrderBookSnapshot;
 import com.bss.bssserverapi.global.websocket.binance.dto.BinanceDepthMessage;
+import com.bss.bssserverapi.global.websocket.binance.dto.OrderBookDto;
 import com.bss.bssserverapi.global.websocket.binance.repository.InMemoryOrderBookBufferRepository;
 import com.bss.bssserverapi.global.websocket.binance.repository.InMemoryOrderBookRepository;
 import com.bss.bssserverapi.global.websocket.binance.repository.OrderBook;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RedissonClient;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ public class OrderBookProcessor {
     private final InMemoryOrderBookBufferRepository orderBookBufferRepository;
     private final InMemoryOrderBookRepository orderBookRepository;
     private final BinanceApiService binanceApiService;
+    private final RedissonClient redissonClient;
 
     @EventListener(ApplicationReadyEvent.class)
     public void consume() throws InterruptedException{
@@ -43,7 +46,7 @@ public class OrderBookProcessor {
                 else
                     update(orderBook, message.getFinalUpdateId(), message.getBids(), message.getAsks());
 
-
+                publish(orderBook);
             }
         }
     }
@@ -93,5 +96,12 @@ public class OrderBookProcessor {
                 orderBook.getAsks().put(price, quantity);
             }
         }
+    }
+
+    private void publish(final OrderBook orderBook) {
+
+        final String redisTopic = "crypto/depth/" + orderBook.getSymbol().toLowerCase();
+        final OrderBookDto orderBookDto = OrderBookDto.from(orderBook, 10L);
+        this.redissonClient.getTopic(redisTopic).publish(orderBookDto);
     }
 }
