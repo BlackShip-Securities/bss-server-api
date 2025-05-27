@@ -21,7 +21,7 @@ public class BinanceApiService {
 
     public List<Kline> fetchKlineList(final String symbol, final String interval, final Long startTime, final Long endTime, final Long limit) {
 
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/kline")
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/klines")
                 .queryParam("symbol", symbol)
                 .queryParam("interval", interval)
                 .queryParam("startTime", startTime)

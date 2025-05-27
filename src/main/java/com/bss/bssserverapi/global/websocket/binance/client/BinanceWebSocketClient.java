@@ -33,7 +33,7 @@ public class BinanceWebSocketClient {
     private BinanceWebSocketHandler webSocketHandler;
 
     private final ObjectMapper objectMapper;
-    private final List<String> symbols = List.of("btcusdt", "ethusdt");
+    private final List<String> symbols = List.of("btcusdt");
     private final BinanceMessageDispatcher dispatcher;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -54,7 +54,7 @@ public class BinanceWebSocketClient {
 
             // TODO: 리팩토링, @depth@1000ms -> @depth@100ms
             String streamPath = String.join("/", symbols.stream()
-                    .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade", s + "@depth@1000ms").stream()).toList());
+                    .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade", s + "@depth@100ms").stream()).toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
 
             this.webSocketSession = this.webSocketClient.doHandshake(this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
