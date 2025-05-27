@@ -1,6 +1,7 @@
 package com.bss.bssserverapi.global.external;
 
 import com.bss.bssserverapi.domain.kline.Kline;
+import com.bss.bssserverapi.global.external.dto.BinanceOrderBookSnapshot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,12 +16,12 @@ import java.util.List;
 @Component
 public class BinanceApiService {
 
-    private static final String BASE_URL = "https://api.binance.com/api/v3/klines";
+    private static final String BASE_URL = "https://api.binance.com/api/v3";
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<Kline> fetchKlineList(final String symbol, final String interval, final Long startTime, final Long endTime, final Long limit) {
 
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL)
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/kline")
                 .queryParam("symbol", symbol)
                 .queryParam("interval", interval)
                 .queryParam("startTime", startTime)
@@ -70,5 +71,23 @@ public class BinanceApiService {
             throw new IllegalStateException("No kline found for symbol=" + symbol);
 
         return klineList.get(0).getOpenTime();
+    }
+
+    public BinanceOrderBookSnapshot fetchOrderBookSnapshot(final String symbol, final int limit) {
+
+        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL + "/depth")
+                .queryParam("symbol", symbol)
+                .queryParam("limit", limit)  // 5, 10, 100, 500, 1000, 5000
+                .toUriString();
+
+        try {
+            ResponseEntity<BinanceOrderBookSnapshot> response =
+                    restTemplate.getForEntity(url, BinanceOrderBookSnapshot.class);
+
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Failed to fetch order book snapshot for symbol={} limit={}", symbol, limit, e);
+            return null;
+        }
     }
 }
