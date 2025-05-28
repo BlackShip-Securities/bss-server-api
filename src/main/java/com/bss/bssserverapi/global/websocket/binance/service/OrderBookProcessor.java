@@ -38,15 +38,15 @@ public class OrderBookProcessor {
                 }
 
                 final BinanceDepthMessage message = orderBookBufferRepository.pollBySymbol(symbol);
-
                 final OrderBook orderBook = orderBookRepository.findOrSaveBySymbol(message.getSymbol());
-                log.info("[OrderBook] symbol={} LastUpdateId={} U={} u={}", symbol, orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
-                if (orderBook.getLastUpdateId() + 1 < message.getFirstUpdateId())
-                    process(orderBook);
-                else
-                    update(orderBook, message.getFinalUpdateId(), message.getBids(), message.getAsks());
 
-                publish(orderBook);
+                if (orderBook.getLastUpdateId() + 1 < message.getFirstUpdateId()){
+                    this.process(orderBook);
+                } else {
+                    this.update(orderBook, message.getFinalUpdateId(), message.getAsks(), message.getBids());
+                }
+
+                this.publish(orderBook);
             }
         }
     }
@@ -59,42 +59,34 @@ public class OrderBookProcessor {
 
         while (!orderBookBufferRepository.isEmptyBySymbol(symbol)){
             final BinanceDepthMessage message = orderBookBufferRepository.pollBySymbol(symbol);
-            log.info("[process] symbol={} LastUpdateId={} U={} u={}", symbol, snapshot.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
+
             if (message.getFinalUpdateId() <= lastUpdateId)
                 continue;
 
             orderBook.clear();
-            update(orderBook, snapshot.getLastUpdateId(), snapshot.getBids(), snapshot.getAsks());
-            update(orderBook, message.getFinalUpdateId(), message.getBids(), message.getAsks());
+            update(orderBook, snapshot.getLastUpdateId(), snapshot.getAsks(), snapshot.getBids());
+            update(orderBook, message.getFinalUpdateId(), message.getAsks(), message.getBids());
         }
     }
 
-    private void update(final OrderBook orderBook, final Long lastUpdateId, final List<List<String>> bids, final List<List<String>> asks){
+    private void update(final OrderBook orderBook, final Long lastUpdateId, final List<List<String>> asks, final List<List<String>> bids){
 
         orderBook.setLastUpdateId(lastUpdateId);
-
-        // bids
-        for (final List<String> bid : bids) {
-            final BigDecimal price = new BigDecimal(bid.get(0));
-            final BigDecimal quantity = new BigDecimal(bid.get(1));
-
-            if (quantity.compareTo(BigDecimal.ZERO) == 0) {
-                orderBook.getBids().remove(price);
-            } else {
-                orderBook.getBids().put(price, quantity);
-            }
-        }
 
         // asks
         for (final List<String> ask : asks) {
             final BigDecimal price = new BigDecimal(ask.get(0));
             final BigDecimal quantity = new BigDecimal(ask.get(1));
 
-            if (quantity.compareTo(BigDecimal.ZERO) == 0) {
-                orderBook.getAsks().remove(price);
-            } else {
-                orderBook.getAsks().put(price, quantity);
-            }
+            orderBook.updateAsk(price, quantity);
+        }
+
+        // bids
+        for (final List<String> bid : bids) {
+            final BigDecimal price = new BigDecimal(bid.get(0));
+            final BigDecimal quantity = new BigDecimal(bid.get(1));
+
+            orderBook.updateBid(price, quantity);
         }
     }
 

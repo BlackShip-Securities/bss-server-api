@@ -52,7 +52,7 @@ public class BinanceWebSocketClient {
 
             this.webSocketClient = new StandardWebSocketClient(container);
 
-            // TODO: 리팩토링, @depth@1000ms -> @depth@100ms
+            // TODO: 리팩토링
             String streamPath = String.join("/", symbols.stream()
                     .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade", s + "@depth@100ms").stream()).toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
