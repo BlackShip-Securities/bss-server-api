@@ -8,15 +8,14 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-@Order(4)
 @Slf4j
+@Order(4)
+@LocalDummyInit
+@RequiredArgsConstructor
 public class CommentDummyInitRunner implements ApplicationRunner {
 
     private final JdbcTemplate jdbcTemplate;

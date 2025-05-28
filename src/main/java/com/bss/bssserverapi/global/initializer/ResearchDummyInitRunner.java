@@ -10,7 +10,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -18,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
-@Component
 @Order(2)
+@LocalDummyInit
+@RequiredArgsConstructor
 public class ResearchDummyInitRunner implements ApplicationRunner {
 
     private final JdbcTemplate jdbcTemplate;
