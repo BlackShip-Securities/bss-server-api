@@ -4,6 +4,8 @@ import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispa
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.WebSocketContainer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RedissonClient;
@@ -31,28 +33,31 @@ public class BinanceWebSocketClient {
     private BinanceWebSocketHandler webSocketHandler;
 
     private final ObjectMapper objectMapper;
-    private final RedissonClient redissonClient;
-    private final List<String> symbols = List.of("btcusdt", "ethusdt");
+    private final List<String> symbols = List.of("btcusdt");
     private final BinanceMessageDispatcher dispatcher;
     private final ApplicationEventPublisher eventPublisher;
 
     @PostConstruct
     public void init() {
 
-        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.redissonClient, this.dispatcher, this.eventPublisher);
+        this.webSocketHandler = new BinanceWebSocketHandler(this.objectMapper, this::reconnect, this.dispatcher, this.eventPublisher);
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void connect() {
 
         try {
-            this.webSocketClient = new StandardWebSocketClient();
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            container.setDefaultMaxTextMessageBufferSize(1024 * 1024); // 1MB
+
+            this.webSocketClient = new StandardWebSocketClient(container);
+
+            // TODO: 리팩토링
             String streamPath = String.join("/", symbols.stream()
-                    .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade").stream()).toList());
+                    .flatMap(s -> List.of(s + "@ticker", s + "@kline_1m", s + "@trade", s + "@depth@100ms").stream()).toList());
             String url = BASE_BINANCE_WS_URL + streamPath;
 
-            this.webSocketSession = this.webSocketClient.doHandshake
-                    (this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
+            this.webSocketSession = this.webSocketClient.doHandshake(this.webSocketHandler, new WebSocketHttpHeaders(), URI.create(url)).get();
             log.info("Connected to Binance WebSocket: {}", url);
         } catch (Exception e) {
             log.error("Binance WebSocket connection failed", e);

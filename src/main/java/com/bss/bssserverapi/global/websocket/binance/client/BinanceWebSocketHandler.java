@@ -7,7 +7,6 @@ import com.bss.bssserverapi.global.websocket.binance.handler.BinanceMessageDispa
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -19,21 +18,18 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
     private final Runnable reconnect;
-    private final RedissonClient redissonClient;
     private final BinanceMessageDispatcher dispatcher;
     private final ApplicationEventPublisher eventPublisher;
 
     public BinanceWebSocketHandler(
             final ObjectMapper objectMapper,
             final Runnable reconnect,
-            final RedissonClient redissonClient,
             final BinanceMessageDispatcher dispatcher,
             final ApplicationEventPublisher eventPublisher
     ) {
 
         this.objectMapper = objectMapper;
         this.reconnect = reconnect;
-        this.redissonClient = redissonClient;
         this.dispatcher = dispatcher;
         this.eventPublisher = eventPublisher;
     }
@@ -42,7 +38,9 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(final WebSocketSession session) throws Exception {
 
         log.info("[Binance] WebSocket connection established");
-        eventPublisher.publishEvent(new KlineJobTriggerEvent(this));
+
+        // TODO: kline batch
+//        eventPublisher.publishEvent(new KlineJobTriggerEvent(this));
     }
 
     @Override
@@ -68,17 +66,13 @@ public class BinanceWebSocketHandler extends TextWebSocketHandler {
         JsonNode data = root.get("data");
         String eventType = data.get("e").asText();
 
-        BinanceRedisTopicType topicType = BinanceRedisTopicType.fromStreamName(eventType)
+        BinanceRedisTopicType topicType = BinanceRedisTopicType.fromEventType(eventType)
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported event type: " + eventType));
 
         BinanceMessage binanceMessage = (BinanceMessage) this.objectMapper.treeToValue(data, topicType.getMessageType());
 
         // DB or Redis save
-        this.dispatcher.dispatch(binanceMessage);
-
-        // redis publish
-        String redisTopic = topicType.getRedisPrefix() + binanceMessage.getSymbol().toLowerCase();
-        this.redissonClient.getTopic(redisTopic).publish(binanceMessage);
+        this.dispatcher.dispatch(topicType, binanceMessage);
     }
 
     @Override
