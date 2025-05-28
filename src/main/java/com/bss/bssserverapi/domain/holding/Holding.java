@@ -23,9 +23,11 @@ public class Holding {
     private BigDecimal avgBuyPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Crypto crypto;
 
     public void setAccount(final Account account) {

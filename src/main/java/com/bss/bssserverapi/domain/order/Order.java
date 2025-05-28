@@ -38,9 +38,11 @@ public class Order extends DateTimeField {
     private BigDecimal matchedQuantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
     @OneToMany(mappedBy = "order")

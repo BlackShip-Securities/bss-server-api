@@ -35,12 +35,15 @@ public class Trade {
     private LocalDateTime matchedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Crypto crypto;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Order order;
 
     public void setAccount(final Account account) {

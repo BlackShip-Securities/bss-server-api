@@ -22,7 +22,8 @@ public class Account {
     @Column(precision = 19, scale = 5, nullable = false)
     private BigDecimal balance;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "account")
