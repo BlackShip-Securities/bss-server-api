@@ -45,7 +45,7 @@ public class User extends DateTimeField {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Research> researchList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Account account;
 
     @Builder
@@ -70,5 +70,11 @@ public class User extends DateTimeField {
 
         this.researchList.add(research);
         research.setUser(this);
+    }
+
+    public void setAccount(final Account account) {
+
+        this.account = account;
+        account.setUser(this);
     }
 }

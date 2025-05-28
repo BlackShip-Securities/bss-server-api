@@ -39,11 +39,11 @@ public class Trade {
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     public void setAccount(final Account account) {

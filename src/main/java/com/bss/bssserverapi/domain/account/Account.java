@@ -35,6 +35,11 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<Holding> holdingList;
 
+    public Account(final BigDecimal balance){
+
+        this.balance = balance;
+    }
+
     public void addOrder(final Order order){
 
         this.orderList.add(order);
@@ -51,5 +56,10 @@ public class Account {
 
         this.holdingList.add(holding);
         holding.setAccount(this);
+    }
+
+    public void setUser(final User user){
+
+        this.user = user;
     }
 }

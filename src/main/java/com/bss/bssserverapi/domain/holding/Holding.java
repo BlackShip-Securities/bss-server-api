@@ -27,7 +27,7 @@ public class Holding {
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
     public void setAccount(final Account account) {

@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.domain.auth.service;
 
+import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.auth.dto.request.LoginUserReqDto;
 import com.bss.bssserverapi.domain.auth.dto.response.*;
 import com.bss.bssserverapi.domain.auth.repository.AuthRepository;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -32,7 +35,7 @@ public class AuthService {
     @Transactional
     public SignupUserResDto signupUser(final SignupUserReqDto signupUserReqDto, final String guestUserName){
 
-        User user = userJpaRepository.findByUserName(guestUserName)
+        final User user = userJpaRepository.findByUserName(guestUserName)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         if(userJpaRepository.existsByUserName(signupUserReqDto.getUserName())){
@@ -46,6 +49,9 @@ public class AuthService {
         }
 
         user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.ROLE_USER);
+
+        final Account account = new Account(new BigDecimal(10_000));
+        user.setAccount(account);
 
         return SignupUserResDto.builder()
                 .userName(userJpaRepository.save(user).getUserName())
