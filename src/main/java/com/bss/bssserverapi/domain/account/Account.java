@@ -6,12 +6,14 @@ import com.bss.bssserverapi.domain.trade.Trade;
 import com.bss.bssserverapi.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
 
