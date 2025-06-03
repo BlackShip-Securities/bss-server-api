@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -27,13 +28,17 @@ public class OrderBookProcessor {
     private final BinanceApiService binanceApiService;
     private final RedissonClient redissonClient;
 
+    private static final String ASKS_PREFIX = "orderbook:asks:";
+    private static final String BIDS_PREFIX = "orderbook:bids:";
+    private static final Long TIME_SLEEP = 100L;
+
     @EventListener(ApplicationReadyEvent.class)
     public void consume() throws InterruptedException{
 
         while(true){
-            for(final String symbol : orderBookBufferRepository.getSymbols()) {
+            for(final String symbol : orderBookBufferRepository.getSymbols().stream().toList()) {
                 if(orderBookBufferRepository.isEmptyBySymbol(symbol)){
-                    Thread.sleep(20);
+                    Thread.sleep(TIME_SLEEP);
                     continue;
                 }
 
@@ -41,8 +46,10 @@ public class OrderBookProcessor {
                 final OrderBook orderBook = orderBookRepository.findOrSaveBySymbol(message.getSymbol());
 
                 if (orderBook.getLastUpdateId() + 1 < message.getFirstUpdateId()){
+                    log.info("[process] {} {} {}", orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
                     this.process(orderBook);
                 } else {
+                    log.info("[update] {} {} {}", orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
                     this.update(orderBook, message.getFinalUpdateId(), message.getAsks(), message.getBids());
                 }
 
@@ -51,18 +58,19 @@ public class OrderBookProcessor {
         }
     }
 
-    private void process(final OrderBook orderBook){
+    private void process(final OrderBook orderBook) throws InterruptedException{
 
         final String symbol = orderBook.getSymbol();
-        final BinanceOrderBookSnapshot snapshot = binanceApiService.fetchOrderBookSnapshot(symbol, 5000);
+        final BinanceOrderBookSnapshot snapshot = binanceApiService.fetchOrderBookSnapshot(symbol, 20);
         final Long lastUpdateId = snapshot.getLastUpdateId();
+
+        Thread.sleep(TIME_SLEEP);
 
         while (!orderBookBufferRepository.isEmptyBySymbol(symbol)){
             final BinanceDepthMessage message = orderBookBufferRepository.pollBySymbol(symbol);
 
             if (message.getFinalUpdateId() <= lastUpdateId)
                 continue;
-
             orderBook.clear();
             update(orderBook, snapshot.getLastUpdateId(), snapshot.getAsks(), snapshot.getBids());
             update(orderBook, message.getFinalUpdateId(), message.getAsks(), message.getBids());
