@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Component
@@ -28,8 +27,6 @@ public class OrderBookProcessor {
     private final BinanceApiService binanceApiService;
     private final RedissonClient redissonClient;
 
-    private static final String ASKS_PREFIX = "orderbook:asks:";
-    private static final String BIDS_PREFIX = "orderbook:bids:";
     private static final Long TIME_SLEEP = 100L;
 
     @EventListener(ApplicationReadyEvent.class)
