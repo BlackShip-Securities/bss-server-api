@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@RequiredArgsConstructor
-@LocalDummyInit
 @Order(1)
+@LocalDummyInit
+@RequiredArgsConstructor
 public class UserDummyInitRunner implements ApplicationRunner {
 
     private final UserJpaRepository userJpaRepository;

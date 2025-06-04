@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.domain.user;
 
+import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.auth.OAuth2SocialType;
 import com.bss.bssserverapi.domain.auth.dto.request.SignupUserReqDto;
 import com.bss.bssserverapi.domain.research.Research;
@@ -44,6 +45,9 @@ public class User extends DateTimeField {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Research> researchList = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Account account;
+
     @Builder
     public User(final String userName, final String password, final RoleType roleType, final String email, final OAuth2SocialType socialType, final String socialId) {
 
@@ -66,5 +70,11 @@ public class User extends DateTimeField {
 
         this.researchList.add(research);
         research.setUser(this);
+    }
+
+    public void setAccount(final Account account) {
+
+        this.account = account;
+        account.setUser(this);
     }
 }
