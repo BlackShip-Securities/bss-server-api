@@ -21,7 +21,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(precision = 19, scale = 5, nullable = false)
+    @Column(precision = 19, scale = 7, nullable = false)
     private BigDecimal balance;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -52,6 +52,15 @@ public class Account {
 
         this.tradeList.add(trade);
         trade.setAccount(this);
+
+        switch (trade.getSideType()) {
+            case LONG:
+                this.balance = this.balance.subtract(trade.getCost());
+                break;
+            case SHORT:
+                this.balance = this.balance.add(trade.getCost());
+                break;
+        }
     }
 
     public void addHolding(final Holding holding){

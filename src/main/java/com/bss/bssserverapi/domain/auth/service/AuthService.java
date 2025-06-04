@@ -50,7 +50,7 @@ public class AuthService {
 
         user.signup(signupUserReqDto.getUserName(), bCryptPasswordEncoder.encode(signupUserReqDto.getPassword()), RoleType.ROLE_USER);
 
-        final Account account = new Account(new BigDecimal(10_000));
+        final Account account = new Account(new BigDecimal(100_000));
         user.setAccount(account);
 
         return SignupUserResDto.builder()

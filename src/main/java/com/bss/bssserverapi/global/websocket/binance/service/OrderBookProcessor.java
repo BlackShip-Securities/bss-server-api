@@ -46,7 +46,7 @@ public class OrderBookProcessor {
                     log.info("[process] {} {} {}", orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
                     this.process(orderBook);
                 } else {
-                    log.info("[update] {} {} {}", orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
+//                    log.info("[update] {} {} {}", orderBook.getLastUpdateId(), message.getFirstUpdateId(), message.getFinalUpdateId());
                     this.update(orderBook, message.getFinalUpdateId(), message.getAsks(), message.getBids());
                 }
 

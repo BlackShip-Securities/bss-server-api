@@ -29,9 +29,9 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND("B007", "Comment not found"),
     REPLY_TO_COMMENT_ONLY("B008", "Replies can only be written to comments"),
     CRYPTO_NOT_FOUND("B009", "Crypto not found"),
-
-    // common
-    UNKNOWN_SERVER_ERROR("C001", "Unknown Server Error"),
+    UNSUPPORTED_SIDE_TYPE("B010", "Unsupported side type"),
+    NOT_ENOUGH_ORDERBOOK_LIQUIDITY("B011", "Not enough orderbook liquidity"),
+    INSUFFICIENT_BALANCE("B012", "Insufficient balance"),
     ;
 
     private final String code;
