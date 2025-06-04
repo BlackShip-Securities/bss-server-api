@@ -7,9 +7,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Holding {
 
     @Id
@@ -19,7 +19,10 @@ public class Holding {
     @Column(precision = 19, scale = 5, nullable = false)
     private BigDecimal quantity;
 
-    @Column(precision = 19, scale = 5, nullable = false)
+    @Column(precision = 19, scale = 7, nullable = false)
+    private BigDecimal totalPrice;
+
+    @Column(precision = 19, scale = 7, nullable = false)
     private BigDecimal avgBuyPrice;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,6 +33,13 @@ public class Holding {
     @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
+    public Holding() {
+
+        this.quantity = BigDecimal.ZERO;
+        this.totalPrice = BigDecimal.ZERO;
+        this.avgBuyPrice = BigDecimal.ZERO;
+    }
+
     public void setAccount(final Account account) {
 
         this.account = account;
@@ -38,5 +48,12 @@ public class Holding {
     public void setCrypto(final Crypto crypto) {
 
         this.crypto = crypto;
+    }
+
+    public void applyBuyTrade(final BigDecimal tradeQty, final BigDecimal cost) {
+
+        this.quantity = this.quantity.add(tradeQty);
+        this.totalPrice = this.totalPrice.add(cost);
+        this.avgBuyPrice = this.totalPrice.divide(this.quantity, 7, RoundingMode.HALF_UP);
     }
 }

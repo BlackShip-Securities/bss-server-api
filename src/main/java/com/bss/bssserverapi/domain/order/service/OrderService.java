@@ -4,6 +4,8 @@ import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
+import com.bss.bssserverapi.domain.holding.Holding;
+import com.bss.bssserverapi.domain.holding.repository.HoldingJpaRepository;
 import com.bss.bssserverapi.domain.order.Order;
 import com.bss.bssserverapi.domain.order.OrderType;
 import com.bss.bssserverapi.domain.order.SideType;
@@ -34,6 +36,7 @@ public class OrderService {
     private final AccountJpaRepository accountJpaRepository;
     private final InMemoryOrderBookRepository inMemoryOrderBookRepository;
     private final OrderJpaRepository orderJpaRepository;
+    private final HoldingJpaRepository holdingJpaRepository;
 
     private final int LIMIT = 20;
 
@@ -116,6 +119,8 @@ public class OrderService {
                 .remainingQuantity(qty)
                 .build();
 
+        final Holding holding = this.getOrSaveHolding(account, crypto);
+
         account.addOrder(order);
         order.setCrypto(crypto);
 
@@ -147,6 +152,8 @@ public class OrderService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
+            holding.applyBuyTrade(tradeQty, cost);
+
             depth++;
         }
 
@@ -154,6 +161,12 @@ public class OrderService {
         order.updateStatusType(StatusType.MATCHED);
 
         orderJpaRepository.save(order);
+    }
+
+    private Holding getOrSaveHolding(final Account account, final Crypto crypto) {
+
+        return holdingJpaRepository.findByAccountAndCrypto(account, crypto)
+                .orElse(holdingJpaRepository.save(new Holding()));
     }
 
     private void createSpotShortOrderByMarket(final User user, final Account account, final String symbol, final BigDecimal qty) {
