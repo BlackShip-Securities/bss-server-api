@@ -46,36 +46,54 @@ public class OrderService {
         final User user = userJpaRepository.findByUserName(userName)
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
-        final Account account = accountJpaRepository.findAccountByUser(user);
-
         final Crypto crypto = cryptoJpaRepository.findBySymbol(req.getSymbol())
                 .orElseThrow(() -> new GlobalException(HttpStatus.NOT_FOUND, ErrorCode.CRYPTO_NOT_FOUND));
+
+        final OrderBook orderBook = inMemoryOrderBookRepository.findOrSaveBySymbol(crypto.getSymbol());
+
+        final Account account = accountJpaRepository.findAccountByUser(user);
+
+        final Holding holding = this.getOrSaveHolding(account, crypto);
 
         final SideType sideType = req.getSideType();
 
         switch (sideType) {
             case LONG:
-                this.createSpotLongOrderByMarket(account, crypto, req.getQty());
+                this.createSpotLongOrderByMarket(orderBook, account, holding, crypto, req.getQty());
                 break;
             case SHORT:
-                this.createSpotShortOrderByMarket(user, account, req.getSymbol(), req.getQty());
+                this.createSpotShortOrderByMarket(orderBook, account, holding, crypto, req.getQty());
                 break;
             default:
                 throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.UNSUPPORTED_SIDE_TYPE);
         }
     }
 
-    private void createSpotLongOrderByMarket(final Account account, final Crypto crypto, final BigDecimal qty) {
+    private Holding getOrSaveHolding(final Account account, final Crypto crypto) {
 
-        final OrderBook orderBook = inMemoryOrderBookRepository.findOrSaveBySymbol(crypto.getSymbol());
-        final NavigableMap<BigDecimal, BigDecimal> asks = orderBook.getAsks();
-
-        this.checkOrderBookLiquidity(account.getBalance(), qty, asks);
-
-        this.matchSpotLongOrder(qty, account, crypto, asks);
+        return holdingJpaRepository.findByAccountAndCrypto(account, crypto)
+                .orElseGet(() -> holdingJpaRepository.save(new Holding(account, crypto)));
     }
 
-    private void checkOrderBookLiquidity(final BigDecimal balance, final BigDecimal qty, final NavigableMap<BigDecimal, BigDecimal> asks) {
+    private void createSpotLongOrderByMarket(final OrderBook orderBook, final Account account, final Holding holding, final Crypto crypto, final BigDecimal qty) {
+
+        final NavigableMap<BigDecimal, BigDecimal> asks = orderBook.getAsks();
+
+        this.checkAsksLiquidity(account.getBalance(), qty, asks);
+
+        this.matchSpotLongOrder(qty, account, holding, crypto, asks);
+    }
+
+    public void createSpotShortOrderByMarket(final OrderBook orderBook, final Account account, final Holding holding, final Crypto crypto, final BigDecimal qty) {
+
+        final NavigableMap<BigDecimal, BigDecimal> bids = orderBook.getBids();
+
+        this.checkBidsLiquidity(holding, qty, bids);
+
+        this.matchSpotShortOrder(qty, account, holding, crypto, bids);
+    }
+
+    private void checkAsksLiquidity(final BigDecimal balance, final BigDecimal qty, final NavigableMap<BigDecimal, BigDecimal> asks) {
 
         BigDecimal remainingQty = qty;
         BigDecimal totalCost = BigDecimal.ZERO;
@@ -107,7 +125,35 @@ public class OrderService {
         }
     }
 
-    private void matchSpotLongOrder(final BigDecimal qty, final Account account, final Crypto crypto, final NavigableMap<BigDecimal, BigDecimal> asks) {
+    private void checkBidsLiquidity(final Holding holding, final BigDecimal qty, final NavigableMap<BigDecimal, BigDecimal> asks) {
+
+        // 보유 수량을 초과하는 매도 요청
+        if(holding.getQuantity().compareTo(qty) < 0) {
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY);
+        }
+
+        BigDecimal remainingQty = qty;
+        int depth = 0;
+
+        for(final var entry : asks.entrySet()){
+            if(depth >= LIMIT || remainingQty.compareTo(BigDecimal.ZERO) == 0)  break;
+
+            final BigDecimal availableQty = entry.getValue();
+
+            final BigDecimal tradeQty = remainingQty.min(availableQty);
+
+            remainingQty = remainingQty.subtract(tradeQty);
+
+            depth++;
+        }
+
+        // 20depth 의 호가로 매도 요청을 체결할 수 없는 경우
+        if(remainingQty.compareTo(BigDecimal.ZERO) > 0){
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_ENOUGH_ORDERBOOK_LIQUIDITY);
+        }
+    }
+
+    private void matchSpotLongOrder(final BigDecimal qty, final Account account, final Holding holding, final Crypto crypto, final NavigableMap<BigDecimal, BigDecimal> asks) {
 
         // 주문 생성
         final Order order = Order.builder()
@@ -118,8 +164,6 @@ public class OrderService {
                 .quantity(qty)
                 .remainingQuantity(qty)
                 .build();
-
-        final Holding holding = this.getOrSaveHolding(account, crypto);
 
         account.addOrder(order);
         order.setCrypto(crypto);
@@ -144,7 +188,7 @@ public class OrderService {
                     .sideType(SideType.LONG)
                     .price(price)
                     .quantity(tradeQty)
-                    .cost(cost)
+                    .amount(cost)
                     .fee(BigDecimal.ZERO)
                     .build();
 
@@ -152,7 +196,7 @@ public class OrderService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
-            holding.applyBuyTrade(tradeQty, cost);
+            holding.applyLongTrade(tradeQty, cost);
 
             depth++;
         }
@@ -163,13 +207,58 @@ public class OrderService {
         orderJpaRepository.save(order);
     }
 
-    private Holding getOrSaveHolding(final Account account, final Crypto crypto) {
+    private void matchSpotShortOrder(final BigDecimal qty, final Account account, final Holding holding, final Crypto crypto, final NavigableMap<BigDecimal, BigDecimal> asks) {
 
-        return holdingJpaRepository.findByAccountAndCrypto(account, crypto)
-                .orElse(holdingJpaRepository.save(new Holding()));
-    }
+        // 주문 생성
+        final Order order = Order.builder()
+                .sideType(SideType.SHORT)
+                .orderType(OrderType.MARKET)
+                .statusType(StatusType.NEW)
+                .price(BigDecimal.ZERO) // TODO: 이론상 최대값으로 해놓거나, Entity 분리
+                .quantity(qty)
+                .remainingQuantity(qty)
+                .build();
 
-    private void createSpotShortOrderByMarket(final User user, final Account account, final String symbol, final BigDecimal qty) {
+        account.addOrder(order);
+        order.setCrypto(crypto);
 
+        // 거래 체결
+        BigDecimal remainingQty = qty;
+        BigDecimal totalRevenue = BigDecimal.ZERO;
+        int depth = 0;
+
+        for(final var entry : asks.entrySet()){
+            if(depth >= LIMIT || remainingQty.compareTo(BigDecimal.ZERO) == 0)  break;
+
+            final BigDecimal price = entry.getKey();
+            final BigDecimal availableQty = entry.getValue();
+
+            final BigDecimal tradeQty = remainingQty.min(availableQty);
+            final BigDecimal revenue = price.multiply(tradeQty);
+
+            totalRevenue = totalRevenue.add(revenue);
+            remainingQty = remainingQty.subtract(tradeQty);
+
+            final Trade trade = Trade.builder()
+                    .sideType(SideType.SHORT)
+                    .price(price)
+                    .quantity(tradeQty)
+                    .amount(revenue)
+                    .fee(BigDecimal.ZERO)
+                    .build();
+
+            order.addTrade(trade);
+            account.addTrade(trade);
+            trade.setCrypto(crypto);
+
+            holding.applyShortTrade(tradeQty, revenue);
+
+            depth++;
+        }
+
+        // 거래 체결(매칭 완료)
+        order.updateStatusType(StatusType.MATCHED);
+
+        orderJpaRepository.save(order);
     }
 }

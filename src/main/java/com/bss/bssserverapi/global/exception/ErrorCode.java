@@ -32,6 +32,7 @@ public enum ErrorCode {
     UNSUPPORTED_SIDE_TYPE("B010", "Unsupported side type"),
     NOT_ENOUGH_ORDERBOOK_LIQUIDITY("B011", "Not enough orderbook liquidity"),
     INSUFFICIENT_BALANCE("B012", "Insufficient balance"),
+    INSUFFICIENT_QUANTITY("B012", "Insufficient quantity"),
     ;
 
     private final String code;

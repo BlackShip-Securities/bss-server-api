@@ -55,10 +55,10 @@ public class Account {
 
         switch (trade.getSideType()) {
             case LONG:
-                this.balance = this.balance.subtract(trade.getCost());
+                this.balance = this.balance.subtract(trade.getAmount());
                 break;
             case SHORT:
-                this.balance = this.balance.add(trade.getCost());
+                this.balance = this.balance.add(trade.getAmount());
                 break;
         }
     }

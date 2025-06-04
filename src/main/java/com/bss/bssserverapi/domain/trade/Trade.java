@@ -35,7 +35,7 @@ public class Trade {
     private BigDecimal quantity;
 
     @Column(precision = 19, scale = 5, nullable = false)
-    private BigDecimal cost;
+    private BigDecimal amount;
 
     @Column(precision = 19, scale = 5, nullable = false)
     private BigDecimal fee;
@@ -56,12 +56,12 @@ public class Trade {
     private Order order;
 
     @Builder
-    public Trade(final SideType sideType, final BigDecimal price, final BigDecimal quantity, final BigDecimal cost, final BigDecimal fee) {
+    public Trade(final SideType sideType, final BigDecimal price, final BigDecimal quantity, final BigDecimal amount, final BigDecimal fee) {
 
         this.sideType = sideType;
         this.price = price;
         this.quantity = quantity;
-        this.cost = cost;
+        this.amount = amount;
         this.fee = fee;
     }
 

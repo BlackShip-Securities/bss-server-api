@@ -18,7 +18,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/buy/market")
+    @PostMapping("/market")
     public ResponseEntity<?> createSpotOrderByMarket(@AuthenticationPrincipal String userName, @RequestBody CreateSpotOrderByMarketReqDto createSpotOrderByMarketReqDto) {
 
         orderService.createSpotOrderByMarket(userName, createSpotOrderByMarketReqDto);
