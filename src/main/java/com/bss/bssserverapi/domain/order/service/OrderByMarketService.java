@@ -29,7 +29,7 @@ import java.util.NavigableMap;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderByMarketService {
 
     private final UserJpaRepository userJpaRepository;
     private final CryptoJpaRepository cryptoJpaRepository;

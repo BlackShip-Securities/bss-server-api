@@ -7,6 +7,7 @@ import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "orders")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends DateTimeField {
 
