@@ -196,7 +196,7 @@ public class OrderByMarketService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
-            holding.applyLongTrade(tradeQty, cost);
+            holding.applyLongTrade(trade);
 
             depth++;
         }
@@ -251,7 +251,7 @@ public class OrderByMarketService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
-            holding.applyShortTrade(tradeQty, revenue);
+            holding.applyShortTrade(trade);
 
             depth++;
         }

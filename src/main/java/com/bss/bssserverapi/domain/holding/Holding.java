@@ -49,6 +49,12 @@ public class Holding {
         this.avgBuyPrice = BigDecimal.ZERO;
     }
 
+    public Holding(final Account account, final Crypto crypto) {
+
+        this.account = account;
+        this.crypto = crypto;
+    }
+
     public void setAccount(final Account account) {
 
         this.account = account;
@@ -59,21 +65,39 @@ public class Holding {
         this.crypto = crypto;
     }
 
-    public void addTrade(final Trade trade) {
+    public void applyLongTrade(final Trade trade) {
 
-        switch (trade.getSideType()) {
-            case LONG:
-                this.quantity = this.quantity.add(trade.getQuantity());
-                break;
-            case SHORT:
-                this.quantity = this.quantity.subtract(trade.getQuantity());
-                break;
-        }
+        final BigDecimal tradeQty = trade.getQuantity();
+        final BigDecimal tradePrice = trade.getPrice();
 
-        if (this.quantity.compareTo(BigDecimal.ZERO) == 0) {
-            this.avgBuyPrice = BigDecimal.ZERO;
-        } else {
+        final BigDecimal tradeTotal = tradeQty.multiply(tradePrice);
+
+        this.totalPrice = this.totalPrice.add(tradeTotal);
+        this.quantity = this.quantity.add(tradeQty);
+
+        if (this.quantity.compareTo(BigDecimal.ZERO) > 0) {
             this.avgBuyPrice = this.totalPrice.divide(this.quantity, 7, RoundingMode.HALF_UP);
+        } else {
+            this.avgBuyPrice = BigDecimal.ZERO;
+        }
+    }
+
+    public void applyShortTrade(final Trade trade) {
+
+        final BigDecimal tradeQty = trade.getQuantity();
+
+        // TODO: 밖으로 뺄지 여기 나둘지
+//        if (this.quantity.compareTo(tradeQty) < 0) {
+//            throw new IllegalStateException("보유 수량보다 많은 매도를 시도했습니다.");
+//        }
+
+        this.quantity = this.quantity.subtract(tradeQty);
+        this.totalPrice = this.totalPrice.subtract(this.avgBuyPrice.multiply(tradeQty));
+
+        if (this.quantity.compareTo(BigDecimal.ZERO) <= 0) {
+            this.quantity = BigDecimal.ZERO;
+            this.totalPrice = BigDecimal.ZERO;
+            this.avgBuyPrice = BigDecimal.ZERO;
         }
     }
 }

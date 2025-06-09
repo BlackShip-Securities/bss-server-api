@@ -3,6 +3,7 @@ package com.bss.bssserverapi.global.websocket.binance.service;
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
 import com.bss.bssserverapi.domain.account.service.AccountService;
+import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
 import com.bss.bssserverapi.domain.holding.Holding;
@@ -89,7 +90,7 @@ public class OrderMatchingService {
             final Holding holding = holdingJpaRepository.findByAccountAndCrypto(account, crypto)
                     .orElseGet(Holding::new);
 
-            holding.addTrade(trade);
+            holding.applyLongTrade(trade);
             account.addHolding(holding);
             order.addTrade(trade);
             account.addTrade(trade);
@@ -143,7 +144,14 @@ public class OrderMatchingService {
             }
 
             // TODO: 홀딩에서 매수 체결 내역을 빼야함
-            holding.addTrade(trade.getQuantity(), trade.getPrice());
+            holding.applyShortTrade(trade);
+
+            final ClosingProfitLoss closingProfitLoss = new ClosingProfitLoss();
+            closingProfitLoss.calculateFromTradeAndHolding(trade, holding);
+
+            account.addClosingProfitLoss(closingProfitLoss);
+            closingProfitLoss.setCrypto(crypto);
+            closingProfitLoss.setTrade(trade);
 
             order.addTrade(trade);
             if (order.getRemainingQuantity().compareTo(BigDecimal.ZERO) == 0) {

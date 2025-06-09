@@ -2,6 +2,7 @@ package com.bss.bssserverapi.domain.closing_profit_loss;
 
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.crypto.Crypto;
+import com.bss.bssserverapi.domain.holding.Holding;
 import com.bss.bssserverapi.domain.trade.Trade;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -11,11 +12,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity(name = "closing_profit_loss")
 @EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class ClosingProfitLoss {
 
     @Id
@@ -24,6 +26,9 @@ public class ClosingProfitLoss {
 
     @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal entryPrice;
+
+    @Column(precision = 19, scale = 2, nullable = false)
+    private BigDecimal matchedPrice;
 
     @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal matchedProfit;
@@ -46,12 +51,19 @@ public class ClosingProfitLoss {
     @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
-    @Builder
-    public ClosingProfitLoss(final BigDecimal entryPrice, final BigDecimal matchedProfit, final BigDecimal matchedProfitRate) {
+    public void calculateFromTradeAndHolding(final Trade trade, final Holding holding) {
 
-        this.entryPrice = entryPrice;
-        this.matchedProfit = matchedProfit;
-        this.matchedProfitRate = matchedProfitRate;
+        this.entryPrice = holding.getAvgBuyPrice();
+        this.matchedPrice = trade.getPrice();
+        final BigDecimal quantity = trade.getQuantity();
+
+        this.matchedProfit = matchedPrice.subtract(entryPrice).multiply(quantity);
+
+        if (entryPrice.compareTo(BigDecimal.ZERO) == 0) {
+            this.matchedProfitRate = BigDecimal.ZERO;
+        } else {
+            this.matchedProfitRate = matchedPrice.subtract(entryPrice).divide(entryPrice, 1, RoundingMode.HALF_UP);
+        }
     }
 
     public void setAccount(final Account account) {
