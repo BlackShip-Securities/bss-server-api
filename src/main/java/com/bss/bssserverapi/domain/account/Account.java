@@ -1,5 +1,6 @@
 package com.bss.bssserverapi.domain.account;
 
+import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
 import com.bss.bssserverapi.domain.holding.Holding;
 import com.bss.bssserverapi.domain.order.Order;
 import com.bss.bssserverapi.domain.trade.Trade;
@@ -37,6 +38,9 @@ public class Account {
     @OneToMany(mappedBy = "account")
     private List<Holding> holdingList;
 
+    @OneToMany(mappedBy = "account")
+    private List<ClosingProfitLoss> closingProfitLossList;
+
     public Account(final BigDecimal balance){
 
         this.balance = balance;
@@ -67,6 +71,12 @@ public class Account {
 
         this.holdingList.add(holding);
         holding.setAccount(this);
+    }
+
+    public void addClosingProfitLoss(final ClosingProfitLoss closingProfitLoss) {
+
+        this.closingProfitLossList.add(closingProfitLoss);
+        closingProfitLoss.setAccount(this);
     }
 
     public void setUser(final User user){
