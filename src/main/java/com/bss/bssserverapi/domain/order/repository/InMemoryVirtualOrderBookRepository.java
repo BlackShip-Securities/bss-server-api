@@ -5,8 +5,13 @@ import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.order.dto.InMemoryOrderDto;
 
 import java.util.NavigableSet;
+import java.util.Set;
 
 public interface InMemoryVirtualOrderBookRepository {
+
+    Set<String> keySet();
+
+    Set<Long> findAccountIdsByCryptoId(final Long cryptoId);
 
     NavigableSet<InMemoryOrderDto> findAsksByCryptoAndAccount(final Crypto crypto, final Account account);
 

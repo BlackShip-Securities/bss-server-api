@@ -39,4 +39,9 @@ public class InMemoryOrderDto {
                 .qty(order.getRemainingQuantity())
                 .build();
     }
+
+    public void subtractQty(final BigDecimal executeQty) {
+
+        this.qty = this.qty.subtract(executeQty);
+    }
 }

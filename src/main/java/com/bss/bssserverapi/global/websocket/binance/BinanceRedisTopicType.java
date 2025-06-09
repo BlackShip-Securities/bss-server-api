@@ -1,9 +1,6 @@
 package com.bss.bssserverapi.global.websocket.binance;
 
-import com.bss.bssserverapi.global.websocket.binance.dto.BinanceDepthMessage;
-import com.bss.bssserverapi.global.websocket.binance.dto.BinanceKlineMessage;
-import com.bss.bssserverapi.global.websocket.binance.dto.BinanceTickerMessage;
-import com.bss.bssserverapi.global.websocket.binance.dto.BinanceTradeMessage;
+import com.bss.bssserverapi.global.websocket.binance.dto.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +14,8 @@ public enum BinanceRedisTopicType {
     KLINE("kline", "crypto/kline/", BinanceKlineMessage.class),
     TICKER("24hrTicker", "crypto/ticker/", BinanceTickerMessage.class),
     TRADE("trade", "crypto/trade/", BinanceTradeMessage.class),
-    DEPTH("depthUpdate", "crypto/depth/", BinanceDepthMessage.class);
+    DEPTH("depthUpdate", "crypto/depth/", BinanceDepthMessage.class),
+    AGG_TRADE("aggTrade", "crypto/aggTrade",BinanceAggTradeMessage.class);
 
     private final String eventType;
     private final String redisPrefix;

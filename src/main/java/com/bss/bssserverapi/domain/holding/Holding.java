@@ -2,8 +2,11 @@ package com.bss.bssserverapi.domain.holding;
 
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.crypto.Crypto;
+import com.bss.bssserverapi.domain.order.SideType;
+import com.bss.bssserverapi.domain.trade.Trade;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +15,6 @@ import java.math.RoundingMode;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "holding",
         uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "crypto_id"})
@@ -40,10 +42,8 @@ public class Holding {
     @JoinColumn(name = "crypto_id")
     private Crypto crypto;
 
-    public Holding(final Account account, final Crypto crypto) {
+    public Holding() {
 
-        this.account = account;
-        this.crypto = crypto;
         this.quantity = BigDecimal.ZERO;
         this.totalPrice = BigDecimal.ZERO;
         this.avgBuyPrice = BigDecimal.ZERO;
@@ -59,22 +59,16 @@ public class Holding {
         this.crypto = crypto;
     }
 
-    public void applyLongTrade(final BigDecimal tradeQty, final BigDecimal cost) {
+    public void addTrade(final Trade trade) {
 
-        this.quantity = this.quantity.add(tradeQty);
-        this.totalPrice = this.totalPrice.add(cost);
-
-        if (this.quantity.compareTo(BigDecimal.ZERO) == 0) {
-            this.avgBuyPrice = BigDecimal.ZERO;
-        } else {
-            this.avgBuyPrice = this.totalPrice.divide(this.quantity, 7, RoundingMode.HALF_UP);
+        switch (trade.getSideType()) {
+            case LONG:
+                this.quantity = this.quantity.add(trade.getQuantity());
+                break;
+            case SHORT:
+                this.quantity = this.quantity.subtract(trade.getQuantity());
+                break;
         }
-    }
-
-    public void applyShortTrade(final BigDecimal tradeQty, final BigDecimal cost) {
-
-        this.quantity = this.quantity.subtract(tradeQty);
-        this.totalPrice = this.totalPrice.subtract(cost);
 
         if (this.quantity.compareTo(BigDecimal.ZERO) == 0) {
             this.avgBuyPrice = BigDecimal.ZERO;

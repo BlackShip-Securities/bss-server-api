@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
+import com.bss.bssserverapi.domain.holding.Holding;
 import com.bss.bssserverapi.domain.holding.repository.HoldingJpaRepository;
 import com.bss.bssserverapi.domain.order.Order;
 import com.bss.bssserverapi.domain.order.OrderType;
@@ -17,14 +18,12 @@ import com.bss.bssserverapi.domain.user.User;
 import com.bss.bssserverapi.domain.user.repository.UserJpaRepository;
 import com.bss.bssserverapi.global.exception.ErrorCode;
 import com.bss.bssserverapi.global.exception.GlobalException;
-import com.bss.bssserverapi.global.websocket.binance.repository.InMemoryOrderBookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.NavigableSet;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,7 @@ public class OrderByLimitService {
     private final AccountJpaRepository accountJpaRepository;
     private final OrderJpaRepository orderJpaRepository;
     private final InMemoryVirtualOrderBookRepository inMemoryVirtualOrderBookRepository;
+    private final HoldingJpaRepository holdingJpaRepository;
 
     @Transactional
     public void createSpotOrderByLimit(final String userName, final CreateSpotOrderByLimitReqDto req) {
@@ -54,44 +54,75 @@ public class OrderByLimitService {
                 this.createSpotLongOrderByLimit(account, crypto, req.getPrice(), req.getQty());
                 break;
             case SHORT:
+                this.createSpotShortOrderByLimit(account, crypto, req.getPrice(), req.getQty());
                 break;
             default:
                 throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.UNSUPPORTED_SIDE_TYPE);
         }
     }
 
-    private void createSpotLongOrderByLimit(final Account account, final Crypto crypto, final BigDecimal price, final BigDecimal qty) {
+    private void createSpotLongOrderByLimit(final Account account, final Crypto crypto, final BigDecimal price, final BigDecimal orderQuantity) {
 
-        this.checkBalance(account, price, qty);
+        this.checkBalance(account, price, orderQuantity);
 
         final Order order = Order.builder()
                 .sideType(SideType.LONG)
                 .orderType(OrderType.LIMIT)
                 .statusType(StatusType.NEW)
                 .price(price)
-                .quantity(qty)
-                .remainingQuantity(qty)
+                .quantity(orderQuantity)
+                .remainingQuantity(orderQuantity)
                 .build();
 
         account.addOrder(order);
         order.setCrypto(crypto);
 
         orderJpaRepository.save(order);
+        accountJpaRepository.save(account);
 
         inMemoryVirtualOrderBookRepository.addBidByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
     }
 
-    private void checkBalance(final Account account, final BigDecimal price, final BigDecimal qty) {
+    private void checkBalance(final Account account, final BigDecimal price, final BigDecimal orderQuantity) {
 
         final BigDecimal balance = account.getBalance();
-        final BigDecimal cost = price.multiply(qty);
+        final BigDecimal cost = price.multiply(orderQuantity);
 
         if(balance.compareTo(cost) < 0) {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_BALANCE);
         }
     }
 
-    private void createSpotShortOrderByLimit() {
+    private void createSpotShortOrderByLimit(final Account account, final Crypto crypto, final BigDecimal price, final BigDecimal orderQuantity) {
 
+        this.checkHolding(account, crypto, orderQuantity);
+
+        final Order order = Order.builder()
+                .sideType(SideType.SHORT)
+                .orderType(OrderType.LIMIT)
+                .statusType(StatusType.NEW)
+                .price(price)
+                .quantity(orderQuantity)
+                .remainingQuantity(orderQuantity)
+                .build();
+
+        account.addOrder(order);
+        order.setCrypto(crypto);
+
+        orderJpaRepository.save(order);
+        accountJpaRepository.save(account);
+
+        inMemoryVirtualOrderBookRepository.addAskByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
+    }
+
+    private void checkHolding(final Account account, final Crypto crypto, final BigDecimal orderQuantity) {
+
+        final Holding holding = holdingJpaRepository.findByAccountAndCrypto(account, crypto)
+                .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY));
+
+        if (orderQuantity.compareTo(holding.getQuantity()) > 0) {
+
+            throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY);
+        }
     }
 }

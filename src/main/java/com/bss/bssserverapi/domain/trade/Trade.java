@@ -11,12 +11,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Trade {
 
@@ -34,7 +36,7 @@ public class Trade {
     @Column(precision = 19, scale = 5, nullable = false)
     private BigDecimal quantity;
 
-    @Column(precision = 19, scale = 5, nullable = false)
+    @Column(precision = 19, scale = 7, nullable = false)
     private BigDecimal amount;
 
     @Column(precision = 19, scale = 5, nullable = false)

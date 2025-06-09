@@ -87,5 +87,11 @@ public class Order extends DateTimeField {
         this.tradeList.add(trade);
         trade.setOrder(this);
         this.remainingQuantity = this.remainingQuantity.subtract(trade.getQuantity());
+
+        if (this.remainingQuantity.compareTo(BigDecimal.ZERO) == 0) {
+            this.updateStatusType(StatusType.MATCHED);
+        } else {
+            this.updateStatusType(StatusType.PARTIALLY_MATCHED);
+        }
     }
 }

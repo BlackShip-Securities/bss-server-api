@@ -14,23 +14,33 @@ public class InMemoryLocalVirtualOrderBookRepository implements InMemoryVirtualO
     private final Map<String, VirtualOrderBook> virtualOrderBookMap = new HashMap<>();
 
     @Override
+    public Set<String> keySet() {
+
+        return Collections.unmodifiableSet(virtualOrderBookMap.keySet());
+    }
+
+    public Set<Long> findAccountIdsByCryptoId(final Long cryptoId) {
+
+        final String prefix = cryptoId + "-";
+        return virtualOrderBookMap.keySet().stream()
+                .filter(key -> key.startsWith(prefix))
+                .map(key -> {
+                    final String[] parts = key.split("-");
+                    return Long.parseLong(parts[1]);
+                })
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public NavigableSet<InMemoryOrderDto> findAsksByCryptoAndAccount(final Crypto crypto, final Account account) {
 
-        return getOrCreate(crypto.getId(), account.getId()).getAsks().stream()
-                .collect(Collectors.toCollection(() -> new TreeSet<>(
-                        Comparator.comparing(InMemoryOrderDto::getPrice)
-                                .thenComparing(InMemoryOrderDto::getOrderId)
-                )));
+        return getOrCreate(crypto.getId(), account.getId()).getAsks();
     }
 
     @Override
     public NavigableSet<InMemoryOrderDto> findBidsByCryptoAndAccount(final Crypto crypto, final Account account) {
 
-        return getOrCreate(crypto.getId(), account.getId()).getBids().stream()
-                .collect(Collectors.toCollection(() -> new TreeSet<>(
-                        Comparator.comparing(InMemoryOrderDto::getPrice).reversed()
-                                .thenComparing(InMemoryOrderDto::getOrderId)
-                )));
+        return getOrCreate(crypto.getId(), account.getId()).getBids();
     }
 
     @Override
