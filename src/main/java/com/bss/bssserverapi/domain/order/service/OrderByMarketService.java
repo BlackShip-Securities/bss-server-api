@@ -2,6 +2,8 @@ package com.bss.bssserverapi.domain.order.service;
 
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
+import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
+import com.bss.bssserverapi.domain.closing_profit_loss.repository.ClosingProfitLossJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
 import com.bss.bssserverapi.domain.holding.Holding;
@@ -37,6 +39,7 @@ public class OrderByMarketService {
     private final InMemoryOrderBookRepository inMemoryOrderBookRepository;
     private final OrderJpaRepository orderJpaRepository;
     private final HoldingJpaRepository holdingJpaRepository;
+    private final ClosingProfitLossJpaRepository closingProfitLossJpaRepository;
 
     private final int LIMIT = 20;
 
@@ -246,6 +249,15 @@ public class OrderByMarketService {
                     .amount(revenue)
                     .fee(BigDecimal.ZERO)
                     .build();
+
+            final ClosingProfitLoss closingProfitLoss = new ClosingProfitLoss();
+            closingProfitLoss.calculateFromTradeAndHolding(trade, holding);
+
+            account.addClosingProfitLoss(closingProfitLoss);
+            closingProfitLoss.setCrypto(crypto);
+            closingProfitLoss.setTrade(trade);
+
+            closingProfitLossJpaRepository.save(closingProfitLoss);
 
             order.addTrade(trade);
             account.addTrade(trade);

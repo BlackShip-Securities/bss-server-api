@@ -4,6 +4,7 @@ import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
 import com.bss.bssserverapi.domain.account.service.AccountService;
 import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
+import com.bss.bssserverapi.domain.closing_profit_loss.repository.ClosingProfitLossJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
 import com.bss.bssserverapi.domain.holding.Holding;
@@ -35,7 +36,7 @@ public class OrderMatchingService {
     private final AccountJpaRepository accountJpaRepository;
     private final TradeJpaRepository tradeJpaRepository;
     private final HoldingJpaRepository holdingJpaRepository;
-    private final AccountService accountService;
+    private final ClosingProfitLossJpaRepository closingProfitLossJpaRepository;
 
     @Transactional
     public void executeMatching(final String symbol, final BigDecimal orderPrice, final BigDecimal orderQuantity) {
@@ -162,6 +163,7 @@ public class OrderMatchingService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
+            closingProfitLossJpaRepository.save(closingProfitLoss);
             holdingJpaRepository.save(holding);
             tradeJpaRepository.save(trade);
             orderJpaRepository.save(order);
