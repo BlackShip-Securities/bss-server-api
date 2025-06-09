@@ -7,6 +7,7 @@ import com.bss.bssserverapi.global.common.DateTimeField;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name = "orders")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends DateTimeField {
 
@@ -85,5 +87,11 @@ public class Order extends DateTimeField {
         this.tradeList.add(trade);
         trade.setOrder(this);
         this.remainingQuantity = this.remainingQuantity.subtract(trade.getQuantity());
+
+        if (this.remainingQuantity.compareTo(BigDecimal.ZERO) == 0) {
+            this.updateStatusType(StatusType.MATCHED);
+        } else {
+            this.updateStatusType(StatusType.PARTIALLY_MATCHED);
+        }
     }
 }

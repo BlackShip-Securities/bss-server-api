@@ -2,6 +2,8 @@ package com.bss.bssserverapi.domain.order.service;
 
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
+import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
+import com.bss.bssserverapi.domain.closing_profit_loss.repository.ClosingProfitLossJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
 import com.bss.bssserverapi.domain.crypto.repository.CryptoJpaRepository;
 import com.bss.bssserverapi.domain.holding.Holding;
@@ -29,7 +31,7 @@ import java.util.NavigableMap;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
+public class OrderByMarketService {
 
     private final UserJpaRepository userJpaRepository;
     private final CryptoJpaRepository cryptoJpaRepository;
@@ -37,6 +39,7 @@ public class OrderService {
     private final InMemoryOrderBookRepository inMemoryOrderBookRepository;
     private final OrderJpaRepository orderJpaRepository;
     private final HoldingJpaRepository holdingJpaRepository;
+    private final ClosingProfitLossJpaRepository closingProfitLossJpaRepository;
 
     private final int LIMIT = 20;
 
@@ -128,7 +131,7 @@ public class OrderService {
     private void checkBidsLiquidity(final Holding holding, final BigDecimal qty, final NavigableMap<BigDecimal, BigDecimal> asks) {
 
         // 보유 수량을 초과하는 매도 요청
-        if(holding.getQuantity().compareTo(qty) < 0) {
+        if(holding.getAvailableQuantity().compareTo(qty) < 0) {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY);
         }
 
@@ -196,7 +199,7 @@ public class OrderService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
-            holding.applyLongTrade(tradeQty, cost);
+            holding.applyLongTrade(trade);
 
             depth++;
         }
@@ -247,11 +250,21 @@ public class OrderService {
                     .fee(BigDecimal.ZERO)
                     .build();
 
+            final ClosingProfitLoss closingProfitLoss = new ClosingProfitLoss();
+            closingProfitLoss.calculateFromTradeAndHolding(trade, holding);
+
+            account.addClosingProfitLoss(closingProfitLoss);
+            closingProfitLoss.setCrypto(crypto);
+            closingProfitLoss.setTrade(trade);
+
+            closingProfitLossJpaRepository.save(closingProfitLoss);
+
             order.addTrade(trade);
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
-            holding.applyShortTrade(tradeQty, revenue);
+            holding.subtractAvailableQuantity(trade.getQuantity());
+            holding.applyShortTrade(trade);
 
             depth++;
         }
