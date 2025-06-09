@@ -26,6 +26,9 @@ public class Holding {
     private Long id;
 
     @Column(precision = 19, scale = 5, nullable = false)
+    private BigDecimal availableQuantity;
+
+    @Column(precision = 19, scale = 5, nullable = false)
     private BigDecimal quantity;
 
     @Column(precision = 19, scale = 7, nullable = false)
@@ -44,6 +47,7 @@ public class Holding {
 
     public Holding() {
 
+        this.availableQuantity = BigDecimal.ZERO;
         this.quantity = BigDecimal.ZERO;
         this.totalPrice = BigDecimal.ZERO;
         this.avgBuyPrice = BigDecimal.ZERO;
@@ -74,6 +78,7 @@ public class Holding {
 
         this.totalPrice = this.totalPrice.add(tradeTotal);
         this.quantity = this.quantity.add(tradeQty);
+        this.addAvailableQuantity(tradeQty);
 
         if (this.quantity.compareTo(BigDecimal.ZERO) > 0) {
             this.avgBuyPrice = this.totalPrice.divide(this.quantity, 7, RoundingMode.HALF_UP);
@@ -99,5 +104,15 @@ public class Holding {
             this.totalPrice = BigDecimal.ZERO;
             this.avgBuyPrice = BigDecimal.ZERO;
         }
+    }
+
+    public void addAvailableQuantity(final BigDecimal orderQuantity) {
+
+        this.availableQuantity = this.availableQuantity.add(orderQuantity);
+    }
+
+    public void subtractAvailableQuantity(final BigDecimal orderQuantity) {
+
+        this.availableQuantity = this.availableQuantity.subtract(orderQuantity);
     }
 }

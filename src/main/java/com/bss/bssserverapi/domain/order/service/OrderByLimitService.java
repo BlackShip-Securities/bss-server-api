@@ -95,7 +95,7 @@ public class OrderByLimitService {
 
     private void createSpotShortOrderByLimit(final Account account, final Crypto crypto, final BigDecimal price, final BigDecimal orderQuantity) {
 
-        this.checkHolding(account, crypto, orderQuantity);
+        this.checkAndSubtractHolding(account, crypto, orderQuantity);
 
         final Order order = Order.builder()
                 .sideType(SideType.SHORT)
@@ -115,14 +115,16 @@ public class OrderByLimitService {
         inMemoryVirtualOrderBookRepository.addAskByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
     }
 
-    private void checkHolding(final Account account, final Crypto crypto, final BigDecimal orderQuantity) {
+    private void checkAndSubtractHolding(final Account account, final Crypto crypto, final BigDecimal orderQuantity) {
 
         final Holding holding = holdingJpaRepository.findByAccountAndCrypto(account, crypto)
                 .orElseThrow(() -> new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY));
 
-        if (orderQuantity.compareTo(holding.getQuantity()) > 0) {
+        if (orderQuantity.compareTo(holding.getAvailableQuantity()) > 0) {
 
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY);
         }
+
+        holding.subtractAvailableQuantity(orderQuantity);
     }
 }

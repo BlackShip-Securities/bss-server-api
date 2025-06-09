@@ -131,7 +131,7 @@ public class OrderByMarketService {
     private void checkBidsLiquidity(final Holding holding, final BigDecimal qty, final NavigableMap<BigDecimal, BigDecimal> asks) {
 
         // 보유 수량을 초과하는 매도 요청
-        if(holding.getQuantity().compareTo(qty) < 0) {
+        if(holding.getAvailableQuantity().compareTo(qty) < 0) {
             throw new GlobalException(HttpStatus.BAD_REQUEST, ErrorCode.INSUFFICIENT_QUANTITY);
         }
 
@@ -263,6 +263,7 @@ public class OrderByMarketService {
             account.addTrade(trade);
             trade.setCrypto(crypto);
 
+            holding.subtractAvailableQuantity(trade.getQuantity());
             holding.applyShortTrade(trade);
 
             depth++;
