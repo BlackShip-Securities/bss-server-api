@@ -2,7 +2,6 @@ package com.bss.bssserverapi.global.websocket.binance.service;
 
 import com.bss.bssserverapi.domain.account.Account;
 import com.bss.bssserverapi.domain.account.repository.AccountJpaRepository;
-import com.bss.bssserverapi.domain.account.service.AccountService;
 import com.bss.bssserverapi.domain.closing_profit_loss.ClosingProfitLoss;
 import com.bss.bssserverapi.domain.closing_profit_loss.repository.ClosingProfitLossJpaRepository;
 import com.bss.bssserverapi.domain.crypto.Crypto;
@@ -23,14 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class OrderMatchingService {
 
-    private final InMemoryVirtualOrderBookRepository inMemoryVirtualOrderBookRepository;
+    private final InMemoryVirtualOrderBookRepository virtualOrderBookRepository;
     private final OrderJpaRepository orderJpaRepository;
     private final CryptoJpaRepository cryptoJpaRepository;
     private final AccountJpaRepository accountJpaRepository;
@@ -47,7 +45,7 @@ public class OrderMatchingService {
             return;
         }
 
-        for (final Long accountId : inMemoryVirtualOrderBookRepository.findAccountIdsByCryptoId(crypto.getId())) {
+        for (final Long accountId : virtualOrderBookRepository.findAccountIdsByCryptoId(crypto.getId())) {
 
             final Account account = accountJpaRepository.findByIdForUpdate(accountId);
             if (account == null) {
@@ -62,7 +60,7 @@ public class OrderMatchingService {
 
     private void matchingBids(final Crypto crypto, final Account account, final BigDecimal orderPrice, BigDecimal remainingOrderQty) {
 
-        final Iterator<InMemoryOrderDto> iterator = inMemoryVirtualOrderBookRepository.findBidsByCryptoAndAccount(crypto, account).iterator();
+        final Iterator<InMemoryOrderDto> iterator = virtualOrderBookRepository.findBidsByCryptoAndAccount(crypto, account).iterator();
 
         // match bids
         while (iterator.hasNext() && remainingOrderQty.compareTo(BigDecimal.ZERO) > 0) {
@@ -70,6 +68,7 @@ public class OrderMatchingService {
             final InMemoryOrderDto bidOrder = iterator.next();
             if (bidOrder.getPrice().compareTo(orderPrice) < 0) break;
 
+            final BigDecimal bidPrice = bidOrder.getPrice();
             final BigDecimal bidQuantity = bidOrder.getQty();
             final BigDecimal executedQty = bidQuantity.min(remainingOrderQty);
             remainingOrderQty = remainingOrderQty.subtract(executedQty);
@@ -102,26 +101,23 @@ public class OrderMatchingService {
             orderJpaRepository.save(order);
             accountJpaRepository.save(account);
 
-            if (bidQuantity.compareTo(executedQty) > 0) {
-                bidOrder.subtractQty(executedQty);
-            } else {
-                iterator.remove();
-            }
+            virtualOrderBookRepository.decrementBidQuantity(crypto.getId(), account.getId(), order.getId(), bidPrice, executedQty);
         }
     }
 
     // match asks
     private void matchingAsks(final Crypto crypto, final Account account, final BigDecimal orderPrice, BigDecimal remainingOrderQty) {
 
-        final Iterator<InMemoryOrderDto> iterator = inMemoryVirtualOrderBookRepository.findAsksByCryptoAndAccount(crypto, account).iterator();
+        final Iterator<InMemoryOrderDto> iterator = virtualOrderBookRepository.findAsksByCryptoAndAccount(crypto, account).iterator();
 
         while (iterator.hasNext() && remainingOrderQty.compareTo(BigDecimal.ZERO) > 0) {
 
             final InMemoryOrderDto asksOrder = iterator.next();
             if (asksOrder.getPrice().compareTo(orderPrice) > 0) break;
 
-            final BigDecimal orderQty = asksOrder.getQty();
-            final BigDecimal executedQty = orderQty.min(remainingOrderQty);
+            final BigDecimal askPrice = asksOrder.getPrice();
+            final BigDecimal aksQuantity = asksOrder.getQty();
+            final BigDecimal executedQty = aksQuantity.min(remainingOrderQty);
             remainingOrderQty = remainingOrderQty.subtract(executedQty);
 
             final Order order = orderJpaRepository.findById(asksOrder.orderId).orElse(null);
@@ -169,11 +165,7 @@ public class OrderMatchingService {
             orderJpaRepository.save(order);
             accountJpaRepository.save(account);
 
-            if (orderQty.compareTo(executedQty) > 0) {
-                asksOrder.subtractQty(executedQty);
-            } else {
-                iterator.remove();
-            }
+            virtualOrderBookRepository.decrementAskQuantity(crypto.getId(), account.getId(), order.getId(), askPrice, executedQty);
         }
     }
 }
