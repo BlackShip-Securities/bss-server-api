@@ -33,7 +33,7 @@ public class OrderByLimitService {
     private final CryptoJpaRepository cryptoJpaRepository;
     private final AccountJpaRepository accountJpaRepository;
     private final OrderJpaRepository orderJpaRepository;
-    private final InMemoryVirtualOrderBookRepository inMemoryVirtualOrderBookRepository;
+    private final InMemoryVirtualOrderBookRepository virtualOrderBookRepository;
     private final HoldingJpaRepository holdingJpaRepository;
 
     @Transactional
@@ -80,7 +80,7 @@ public class OrderByLimitService {
         orderJpaRepository.save(order);
         accountJpaRepository.save(account);
 
-        inMemoryVirtualOrderBookRepository.addBidByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
+        virtualOrderBookRepository.addBidByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
     }
 
     private void checkBalance(final Account account, final BigDecimal price, final BigDecimal orderQuantity) {
@@ -112,7 +112,7 @@ public class OrderByLimitService {
         orderJpaRepository.save(order);
         accountJpaRepository.save(account);
 
-        inMemoryVirtualOrderBookRepository.addAskByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
+        virtualOrderBookRepository.addAskByCryptoAndAccount(crypto, account, InMemoryOrderDto.fromEntity(order));
     }
 
     private void checkAndSubtractHolding(final Account account, final Crypto crypto, final BigDecimal orderQuantity) {
