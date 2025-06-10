@@ -120,7 +120,7 @@ public class OrderMatchingService {
             final BigDecimal executedQty = aksQuantity.min(remainingOrderQty);
             remainingOrderQty = remainingOrderQty.subtract(executedQty);
 
-            final Order order = orderJpaRepository.findById(asksOrder.orderId).orElse(null);
+            final Order order = orderJpaRepository.findByIdForUpdate(asksOrder.orderId).orElse(null);
             if (order == null) {
                 log.warn("[OrderMatching] Order not found: id={}", asksOrder.orderId);
                 continue;
@@ -151,13 +151,19 @@ public class OrderMatchingService {
             closingProfitLoss.setTrade(trade);
 
             order.addTrade(trade);
-            if (order.getRemainingQuantity().compareTo(BigDecimal.ZERO) == 0) {
-                order.updateStatusType(StatusType.MATCHED);
-            } else {
-                order.updateStatusType(StatusType.PARTIALLY_MATCHED);
-            }
             account.addTrade(trade);
             trade.setCrypto(crypto);
+
+            log.info("[TRADE] Matched: Side={}, Price={}, Qty={}, Amount={}, Fee={}, OrderId={}, AccountId={}, CryptoId={}",
+                    trade.getSideType(),
+                    trade.getPrice(),
+                    trade.getQuantity(),
+                    trade.getAmount(),
+                    trade.getFee(),
+                    trade.getOrder() != null ? trade.getOrder().getId() : null,
+                    trade.getAccount() != null ? trade.getAccount().getId() : null,
+                    trade.getCrypto() != null ? trade.getCrypto().getId() : null
+            );
 
             closingProfitLossJpaRepository.save(closingProfitLoss);
             holdingJpaRepository.save(holding);
